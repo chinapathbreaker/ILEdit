@@ -44,9 +44,28 @@ namespace ICSharpCode.TreeView
 			}
 		}
 
-		#region Mouse
+        #region Foreground
 
-		Point startPoint;
+        public SharpTreeViewItem()
+        {
+            this.DataContextChanged += new DependencyPropertyChangedEventHandler(SharpTreeViewItem_DataContextChanged);
+        }
+
+        void SharpTreeViewItem_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            //Updates the Foreground property
+            var node = this.Node;
+            if (node != null)
+                this.Foreground = new SolidColorBrush(node.ForegroundColor);
+            else
+                this.Foreground = new SolidColorBrush(Colors.Black);
+        }
+
+        #endregion
+
+        #region Mouse
+
+        Point startPoint;
 		bool wasSelected;
 		bool wasDoubleClick;
 

@@ -156,7 +156,17 @@ namespace ICSharpCode.TreeView
 				}
 			}
 		}
-		
+
+
+        private System.Windows.Media.Color foregroundColor = System.Windows.Media.Color.FromArgb(255, 0, 0, 0);
+        /// <summary>
+        /// Foreground color of the node
+        /// </summary>
+        public virtual System.Windows.Media.Color ForegroundColor { 
+            get { return foregroundColor; }
+        }
+        
+
 		#endregion
 		
 		#region OnChildrenChanged
