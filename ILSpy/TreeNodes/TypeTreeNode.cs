@@ -75,6 +75,14 @@ namespace ICSharpCode.ILSpy.TreeNodes
 				}
 			}
 		}
+
+        public override Color ForegroundColor
+        {
+            get
+            {
+                return IsPublicAPI ? Colors.Black : Colors.Gray;
+            }
+        }
 		
 		public override FilterResult Filter(FilterSettings settings)
 		{

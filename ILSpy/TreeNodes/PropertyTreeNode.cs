@@ -136,6 +136,19 @@ namespace ICSharpCode.ILSpy.TreeNodes
 			return result;
 		}
 
+        public override Color ForegroundColor
+        {
+            get
+            {
+                if (this.property != null && this.property.GetMethod != null)
+                {
+                    var m = this.property.GetMethod;
+                    return (m.IsPublic || m.IsVirtual || m.IsFamily) ? Colors.Black : Colors.Gray;
+                }
+                return Colors.Black;
+            }
+        }
+
 		public override FilterResult Filter(FilterSettings settings)
 		{
 			if (settings.SearchTermMatches(property.Name) && settings.Language.ShowMember(property))

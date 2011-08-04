@@ -52,6 +52,14 @@ namespace ICSharpCode.ILSpy.TreeNodes
 			}
 		}
 
+        public override Color ForegroundColor
+        {
+            get
+            {
+                return (method.IsPublic || method.IsVirtual || method.IsFamily) ? Colors.Black : Colors.Gray;
+            }
+        }
+
 		public static object GetText(MethodDefinition method, Language language)
 		{
 			StringBuilder b = new StringBuilder();

@@ -58,6 +58,19 @@ namespace ICSharpCode.ILSpy.TreeNodes
 			get { return GetText(ev, this.Language); }
 		}
 
+        public override Color ForegroundColor
+        {
+            get
+            {
+                if (ev != null && ev.AddMethod != null)
+                {
+                    var m = ev.AddMethod;
+                    return (m.IsPublic || m.IsVirtual || m.IsFamily) ? Colors.Black : Colors.Gray;
+                }
+                return Colors.Black;
+            }
+        }
+
 		public static object GetText(EventDefinition eventDef, Language language)
 		{
 			return HighlightSearchMatch(eventDef.Name, " : " + language.TypeToString(eventDef.EventType, false, eventDef));

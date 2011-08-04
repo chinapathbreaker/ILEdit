@@ -47,6 +47,14 @@ namespace ICSharpCode.ILSpy.TreeNodes
 			get { return HighlightSearchMatch(field.Name, " : " + this.Language.TypeToString(field.FieldType, false, field)); }
 		}
 
+        public override Color ForegroundColor
+        {
+            get
+            {
+                return (field.IsPublic || field.IsFamily) ? Colors.Black : Colors.Gray;
+            }
+        }
+
 		public override object Icon
 		{
 			get { return GetIcon(field); }
