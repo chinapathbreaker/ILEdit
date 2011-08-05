@@ -6,7 +6,7 @@ using Mono.Cecil;
 
 namespace ICSharpCode.ILSpy.TreeNodes
 {
-    internal sealed class ModuleTreeNode : ILSpyTreeNode
+    public sealed class ModuleTreeNode : ILSpyTreeNode
     {
         private ModuleDefinition module;
         private AssemblyTreeNode assemblyNode;
