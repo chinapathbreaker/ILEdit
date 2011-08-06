@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="ContextMenu\InjectExistingEntry.cs" />
     <Compile Include="ContextMenu\InjectNewEntry.cs" />
+    <Compile Include="ContextMenu\SaveEntry.cs" />
     <Compile Include="Injection\GlobalContainer.cs" />
     <Compile Include="Injection\Injector.cs" />
     <Compile Include="Injection\Injectors\ClassInjector.cs" />
@@ -83,6 +84,9 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\SaveFile.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
