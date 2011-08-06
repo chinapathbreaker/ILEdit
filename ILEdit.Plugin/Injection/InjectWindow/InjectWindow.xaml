@@ -115,7 +115,7 @@
 		</StackPanel>
 		<Border Grid.Row="1" Background="White" Grid.ColumnSpan="2">
 			<TabControl TabStripPlacement="Left" BorderThickness="1,0,0,0" SelectedIndex="{Binding TabSelectedIndex, Mode=TwoWay}">
-				<TabItem>
+				<TabItem Name="TabInjectNew">
 					<TabItem.Header>
 						<StackPanel Orientation="Horizontal" VerticalAlignment="Center" Height="20">
 							<Image Source="/ILEdit.Plugin;component/Images/InjectNew.png" Stretch="None" Margin="0" VerticalAlignment="Center" />
@@ -143,7 +143,7 @@
 			</TabControl>
 		</Border>
 		<TextBlock TextWrapping="Wrap" d:LayoutOverrides="Width, Height" Grid.Row="2" VerticalAlignment="Center" Margin="5,0,15,0"><Run Language="it-it" Text="Name:"/></TextBlock>
-		<TextBox Text="{Binding Name, Mode=TwoWay}" TextWrapping="Wrap" d:LayoutOverrides="Width, Height" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Margin="5"/>
+		<TextBox Text="{Binding Name, Mode=TwoWay}" IsEnabled="{Binding IsSelected, ElementName=TabInjectNew}" TextWrapping="Wrap" d:LayoutOverrides="Width, Height" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Margin="5"/>
 		<StackPanel Orientation="Horizontal" Grid.Row="4" d:LayoutOverrides="Height" Grid.ColumnSpan="2" HorizontalAlignment="Right" Margin="0,0,5,5">
 			<Button Content="Inject" FontWeight="Bold" FontSize="14.667" Width="70" Height="30" Command="{Binding InjectCommand}"/>
 			<Button Content="Cancel" Margin="15,0,0,0" Width="70" VerticalAlignment="Bottom" Height="25" IsCancel="True"/>

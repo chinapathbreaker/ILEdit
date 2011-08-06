@@ -70,15 +70,30 @@ namespace ILEdit.Injection
         public RelayCommand InjectCommand { get { return _InjectCommand; } }
         private void InjectCommandImpl()
         {
-            //Checks that the name has been provided
-            if (string.IsNullOrEmpty(this.Name))
+            //Switches on the injection type (new or existing)
+            switch (TabSelectedIndex)
             {
-                MessageBox.Show("A name is required", "Name required", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
+                //Inject new
+                case 0:
+                    //Checks that the name has been provided
+                    if (string.IsNullOrEmpty(this.Name))
+                    {
+                        MessageBox.Show("A name is required", "Name required", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
 
-            //Injects
-            this.SelectedInjector.Inject(_node, this.Name);
+                    //Injects
+                    this.SelectedInjector.Inject(_node, this.Name);
+                    break;
+               
+                //Inject existing
+                case 1:
+                    break;
+                
+                //Other: exception
+                default:
+                    throw new ArgumentException("Invlid value: it can be only 0 or 1", "TabSelectedIndex");
+            }
         }
         
         #endregion
