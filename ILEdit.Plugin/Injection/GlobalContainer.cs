@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ILEdit.Injection.Injectors;
 
 namespace ILEdit.Injection
 {
@@ -15,7 +16,9 @@ namespace ILEdit.Injection
         static GlobalContainer()
         {
             //Adds the injectors
-            Injectors = new List<IInjector>();
+            Injectors = new List<IInjector>() { 
+                new ClassInjector()
+            };
         }
 
         #endregion

@@ -4,6 +4,7 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 using ICSharpCode.ILSpy;
+using ICSharpCode.ILSpy.TreeNodes;
 using ICSharpCode.TreeView;
 
 namespace ILEdit.ContextMenu
@@ -18,12 +19,12 @@ namespace ILEdit.ContextMenu
 
         public bool IsEnabled(SharpTreeNode[] selectedNodes)
         {
-            return true;
+            return selectedNodes.Length == 1;
         }
 
         public void Execute(SharpTreeNode[] selectedNodes)
         {
-            throw new NotImplementedException();
+            new Injection.InjectWindow((ILSpyTreeNode)selectedNodes[0]).ShowDialog();
         }
     }
 }

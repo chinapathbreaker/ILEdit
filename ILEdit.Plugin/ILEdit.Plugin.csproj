@@ -12,6 +12,8 @@
     <AssemblyName>ILEdit.Plugin</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <Utf8Output>true</Utf8Output>
+    <ExpressionBlendVersion>4.0.20621.0</ExpressionBlendVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -36,6 +38,7 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -48,8 +51,14 @@
     <Compile Include="ContextMenu\InjectNewEntry.cs" />
     <Compile Include="Injection\GlobalContainer.cs" />
     <Compile Include="Injection\Injector.cs" />
+    <Compile Include="Injection\Injectors\ClassInjector.cs" />
+    <Compile Include="Injection\InjectWindow\InjectWindow.xaml.cs">
+      <DependentUpon>InjectWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Injection\InjectWindow\InjectWindowViewModel.cs" />
     <Compile Include="Injection\MemberFilters.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RelayCommand.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ILSpy\ILSpy.csproj">
@@ -68,6 +77,12 @@
   <ItemGroup>
     <Resource Include="Images\InjectExisting.png" />
     <Resource Include="Images\InjectNew.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Injection\InjectWindow\InjectWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

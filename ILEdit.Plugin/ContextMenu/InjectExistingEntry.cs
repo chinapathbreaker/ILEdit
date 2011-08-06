@@ -18,7 +18,7 @@ namespace ILEdit.ContextMenu
 
         public bool IsEnabled(SharpTreeNode[] selectedNodes)
         {
-            return true;
+            return selectedNodes.Length == 1;
         }
 
         public void Execute(SharpTreeNode[] selectedNodes)
