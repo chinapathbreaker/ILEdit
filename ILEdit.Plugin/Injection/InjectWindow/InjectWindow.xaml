@@ -114,7 +114,7 @@
 			<ContentControl Content="{Binding InjectInContent}" FontWeight="Bold" Padding="5,0,0,0" Margin="5,0,0,0"/>
 		</StackPanel>
 		<Border Grid.Row="1" Background="White" Grid.ColumnSpan="2">
-			<TabControl TabStripPlacement="Left" BorderThickness="1,0,0,0">
+			<TabControl TabStripPlacement="Left" BorderThickness="1,0,0,0" SelectedIndex="{Binding TabSelectedIndex, Mode=TwoWay}">
 				<TabItem>
 					<TabItem.Header>
 						<StackPanel Orientation="Horizontal" VerticalAlignment="Center" Height="20">

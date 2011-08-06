@@ -57,6 +57,11 @@ namespace ILEdit.Injection
         /// </summary>
         public string Name { get; set; }
 
+        /// <summary>
+        /// Returns the index of the currently selected tab (0 = New, 1 = Existing)
+        /// </summary>
+        public int TabSelectedIndex { get; set; }
+
         #endregion
 
         #region Inject command
