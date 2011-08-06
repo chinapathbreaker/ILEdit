@@ -45,7 +45,7 @@ namespace ILEdit.Injection.Injectors
             return true;
         }
 
-        public void Inject(ICSharpCode.ILSpy.TreeNodes.ILSpyTreeNode node)
+        public void Inject(ICSharpCode.ILSpy.TreeNodes.ILSpyTreeNode node, string name)
         {
             throw new NotImplementedException();
         }

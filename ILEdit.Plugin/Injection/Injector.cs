@@ -50,6 +50,7 @@ namespace ILEdit.Injection
         /// Injects in the given node
         /// </summary>
         /// <param name="node">Destination node</param>
-        void Inject(ILSpyTreeNode node);
+        /// <param name="name">Name of the new object to inject</param>
+        void Inject(ILSpyTreeNode node, string name);
     }
 }

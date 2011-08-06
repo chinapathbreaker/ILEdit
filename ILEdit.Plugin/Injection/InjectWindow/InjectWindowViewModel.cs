@@ -4,14 +4,20 @@ using System.Linq;
 using System.Text;
 using ICSharpCode.ILSpy.TreeNodes;
 using System.Windows.Media;
+using System.ComponentModel;
+using System.Windows;
 
 namespace ILEdit.Injection
 {
     public class InjectWindowViewModel
     {
         #region .ctor
+        ILSpyTreeNode _node;
         public InjectWindowViewModel(ILSpyTreeNode node)
         {
+            //Stores the given node
+            _node = node;
+
             //Loads the injectors
             Injectors = GlobalContainer.Injectors.Where(x => x.CanInjectInNode(node)).ToArray();
 
@@ -59,7 +65,15 @@ namespace ILEdit.Injection
         public RelayCommand InjectCommand { get { return _InjectCommand; } }
         private void InjectCommandImpl()
         {
-            System.Windows.MessageBox.Show("Command invoked on " + this.SelectedInjector.Name + " with name '" + this.Name + "'");
+            //Checks that the name has been provided
+            if (string.IsNullOrEmpty(this.Name))
+            {
+                MessageBox.Show("A name is required", "Name required", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            //Injects
+            this.SelectedInjector.Inject(_node, this.Name);
         }
         
         #endregion
