@@ -13,9 +13,22 @@ namespace ILEdit.ContextMenu
     [ExportContextMenuEntry(Icon = "Images/InjectExisting.png", Header = "Inject existing ...", Category = "Injection", Order = 1)]
     public class InjectExistingEntry : IContextMenuEntry
     {
+        private static Type[] AllowedNodeTypes = new Type[] { 
+            typeof(AssemblyTreeNode),
+            typeof(ModuleTreeNode)
+        };
+
         public bool IsVisible(SharpTreeNode[] selectedNodes)
         {
-            return true;
+            var memberNode = selectedNodes[0] as IMemberTreeNode;
+            var nodeType = selectedNodes[0].GetType();
+            return
+                (
+                    AllowedNodeTypes.Any(x => x.IsAssignableFrom(nodeType)) ||
+                    (memberNode != null && memberNode.Member.MetadataToken.TokenType == Mono.Cecil.TokenType.TypeDef)
+                )
+                &&
+                !(selectedNodes[0] is ICSharpCode.ILSpy.TreeNodes.Analyzer.AnalyzerTreeNode);
         }
 
         public bool IsEnabled(SharpTreeNode[] selectedNodes)
@@ -46,7 +59,7 @@ namespace ILEdit.ContextMenu
             }
 
             //Shows the injection window
-            new Injection.InjectWindow(node, 1).ShowDialog();
+            new Injection.InjectWindow(node, 1, true).ShowDialog();
         }
     }
 }

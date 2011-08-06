@@ -20,9 +20,9 @@ namespace ILEdit.Injection
     /// </summary>
     public partial class InjectWindow : Window
     {
-        public InjectWindow(ILSpyTreeNode node, int tabSelectedIndex)
+        public InjectWindow(ILSpyTreeNode node, int tabSelectedIndex, bool injectExistingEnabled)
         {
-            this.DataContext = new InjectWindowViewModel(node, this) { TabSelectedIndex = tabSelectedIndex };
+            this.DataContext = new InjectWindowViewModel(node, this) { TabSelectedIndex = tabSelectedIndex, InjectExistingEnabled = injectExistingEnabled };
             InitializeComponent();
         }
     }

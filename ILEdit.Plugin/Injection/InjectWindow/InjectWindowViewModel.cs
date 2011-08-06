@@ -64,6 +64,11 @@ namespace ILEdit.Injection
         /// </summary>
         public int TabSelectedIndex { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the tab 'Inject existing' is enabled or not
+        /// </summary>
+        public bool InjectExistingEnabled { get; set; }
+
         #endregion
 
         #region Inject command
