@@ -13,10 +13,12 @@ namespace ILEdit.Injection
     {
         #region .ctor
         ILSpyTreeNode _node;
-        public InjectWindowViewModel(ILSpyTreeNode node)
+        Window _window;
+        public InjectWindowViewModel(ILSpyTreeNode node, Window window)
         {
-            //Stores the given node
+            //Stores the given parameters
             _node = node;
+            _window = window;
 
             //Loads the injectors
             Injectors = GlobalContainer.Injectors.Where(x => x.CanInjectInNode(node)).ToArray();
@@ -94,6 +96,9 @@ namespace ILEdit.Injection
                 default:
                     throw new ArgumentException("Invlid value: it can be only 0 or 1", "TabSelectedIndex");
             }
+
+            //Closes the window
+            _window.Close();
         }
         
         #endregion

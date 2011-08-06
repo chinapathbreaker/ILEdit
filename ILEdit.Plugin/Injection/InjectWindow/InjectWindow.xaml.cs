@@ -22,7 +22,7 @@ namespace ILEdit.Injection
     {
         public InjectWindow(ILSpyTreeNode node, int tabSelectedIndex)
         {
-            this.DataContext = new InjectWindowViewModel(node) { TabSelectedIndex = tabSelectedIndex };
+            this.DataContext = new InjectWindowViewModel(node, this) { TabSelectedIndex = tabSelectedIndex };
             InitializeComponent();
         }
     }
