@@ -27,7 +27,7 @@ namespace ICSharpCode.ILSpy.TreeNodes
 	/// <summary>
 	/// Node within assembly reference list.
 	/// </summary>
-	sealed class AssemblyReferenceTreeNode : ILSpyTreeNode
+	public sealed class AssemblyReferenceTreeNode : ILSpyTreeNode
 	{
 		readonly AssemblyNameReference r;
 		readonly AssemblyTreeNode parentAssembly;
@@ -50,6 +50,11 @@ namespace ICSharpCode.ILSpy.TreeNodes
 		public override object Icon {
 			get { return Images.Assembly; }
 		}
+
+        public AssemblyNameReference Reference
+        {
+            get { return r; }
+        }
 		
 		public override bool ShowExpander {
 			get {
