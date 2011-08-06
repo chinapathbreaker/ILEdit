@@ -108,6 +108,11 @@ namespace ICSharpCode.ILSpy.TreeNodes
 
         #endregion
 
+        public ModuleDefinition Module 
+        {
+            get { return module; }
+        }
+
         public override void Decompile(Language language, Decompiler.ITextOutput output, DecompilationOptions options)
         {
             language.WriteCommentLine(output, this.Text.ToString());
