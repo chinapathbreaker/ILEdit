@@ -1,0 +1,21 @@
+﻿<Window x:Class="ILEdit.InputBox" x:ClassModifier="internal"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             SizeToContent="Height" Width="500" Title="Value required" ShowInTaskbar="False" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBlock Name="Text" Text="Please, provide a value:" />
+        <TextBox Grid.Row="1" Name="TxtValue" Margin="0,5" KeyDown="TxtValue_KeyDown" />
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="Ok" FontWeight="Bold" Click="BtnOk_Click" />
+            <Button Content="Cancel" IsCancel="True" Margin="5,0,0,0" Click="BtnCancel_Click" />
+        </StackPanel>
+    </Grid>
+</Window>
