@@ -52,11 +52,20 @@ namespace ICSharpCode.ILSpy.TreeNodes
 			}
 		}
 
+        private Color? _foregroundColor = null;
         public override Color ForegroundColor
         {
             get
             {
-                return (method.IsPublic || method.IsVirtual || method.IsFamily) ? Colors.Black : Colors.Gray;
+                return _foregroundColor ?? ((method.IsPublic || method.IsVirtual || method.IsFamily) ? Colors.Black : Colors.Gray);
+            }
+            set
+            {
+                if (_foregroundColor.GetValueOrDefault(Colors.Black) != value)
+                {
+                    _foregroundColor = value;
+                    base.ForegroundColor = _foregroundColor.GetValueOrDefault(Colors.Black);
+                }
             }
         }
 

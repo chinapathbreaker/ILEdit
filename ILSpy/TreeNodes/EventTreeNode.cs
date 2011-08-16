@@ -58,16 +58,27 @@ namespace ICSharpCode.ILSpy.TreeNodes
 			get { return GetText(ev, this.Language); }
 		}
 
+        private Color? _foregroundColor = null;
         public override Color ForegroundColor
         {
             get
             {
+                if (_foregroundColor.HasValue)
+                    return _foregroundColor.Value;
                 if (ev != null && ev.AddMethod != null)
                 {
                     var m = ev.AddMethod;
                     return (m.IsPublic || m.IsVirtual || m.IsFamily) ? Colors.Black : Colors.Gray;
                 }
                 return Colors.Black;
+            }
+            set
+            {
+                if (_foregroundColor.GetValueOrDefault(Colors.Black) != value)
+                {
+                    _foregroundColor = value;
+                    base.ForegroundColor = _foregroundColor.GetValueOrDefault(Colors.Black);
+                }
             }
         }
 

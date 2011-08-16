@@ -45,8 +45,16 @@ namespace ILEdit.ContextMenu
             //Asks for the new name and performs the renaming
             var input = new InputBox("New name", content);
             if (input.ShowDialog().GetValueOrDefault(false) && !string.IsNullOrEmpty(input.Value))
+            {
+                //Performs renaming
                 foreach (var x in rename)
                     x.Key.Name = string.Format(x.Value, input.Value);
+
+                //Refreshes the view
+                MainWindow.Instance.RefreshDecompiledView();
+                selectedNodes[0].ForegroundColor = ILEdit.GlobalContainer.ModifiedNodesColor;
+                MainWindow.Instance.RefreshTreeViewFilter();
+            }
         }
 
         public IEnumerable<KeyValuePair<IMemberDefinition, string>> GetObjectsToRename(IMemberDefinition member)

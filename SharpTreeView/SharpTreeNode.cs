@@ -164,6 +164,14 @@ namespace ICSharpCode.TreeView
         /// </summary>
         public virtual System.Windows.Media.Color ForegroundColor { 
             get { return foregroundColor; }
+            set 
+            {
+                if (foregroundColor != value)
+                {
+                    foregroundColor = value;
+                    RaisePropertyChanged("ForegroundColor");
+                }
+            }
         }
         
 

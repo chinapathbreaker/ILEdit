@@ -52,7 +52,7 @@
     <Compile Include="ContextMenu\RemoveEntry.cs" />
     <Compile Include="ContextMenu\RenameEntry.cs" />
     <Compile Include="ContextMenu\SaveEntry.cs" />
-    <Compile Include="Injection\GlobalContainer.cs" />
+    <Compile Include="GlobalContainer.cs" />
     <Compile Include="Injection\Injector.cs" />
     <Compile Include="Injection\Injectors\ClassInjector.cs" />
     <Compile Include="Injection\InjectWindow\InjectWindow.xaml.cs">
