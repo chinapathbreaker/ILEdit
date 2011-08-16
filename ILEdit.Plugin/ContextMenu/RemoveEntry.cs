@@ -57,15 +57,30 @@ namespace ILEdit.ContextMenu
                 //Module
                 var m = ((ModuleTreeNode)node).Module;
 
+                //Finds the assembly node
+                AssemblyDefinition asm = null;
+                ICSharpCode.TreeView.SharpTreeNode currentNode = node;
+                while (asm == null)
+                {
+                    currentNode = currentNode.Parent;
+                    asm = (currentNode as AssemblyTreeNode) == null ? null : ((AssemblyTreeNode)currentNode).LoadedAssembly.AssemblyDefinition;
+                }
+
                 //Checks that this isn't the only module in the assembly
-                if (m.Assembly.Modules.Count == 1)
+                if (asm.Modules.Count == 1)
                 {
                     MessageBox.Show("Cannot remove the only module of an assembly", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
+                //Checks it isn't the main module
+                else if (asm.MainModule == m)
+                {
+                    MessageBox.Show("Cannot remove the main module of an assembly", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
 
                 //Removes the module
-                m.Assembly.Modules.Remove(m);
+                asm.Modules.Remove(m);
             }
             else
             {
