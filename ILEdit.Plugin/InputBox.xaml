@@ -11,7 +11,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <TextBlock Name="Text" Text="Please, provide a value:" />
+        <ContentControl Name="Text" Content="Please, provide a value:" />
         <TextBox Grid.Row="1" Name="TxtValue" Margin="0,5" KeyDown="TxtValue_KeyDown" />
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Content="Ok" FontWeight="Bold" Click="BtnOk_Click" />

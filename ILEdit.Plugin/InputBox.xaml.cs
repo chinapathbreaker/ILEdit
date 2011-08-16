@@ -21,11 +21,11 @@ namespace ILEdit
     {
         public string Value { get { return this.TxtValue.Text; } }
 
-        public InputBox(string caption, string content)
+        public InputBox(string caption, object content)
         {
             InitializeComponent();
             this.Title = caption;
-            Text.Text = content;
+            Text.Content = content;
             this.Loaded += (_, __) => TxtValue.Focus();
         }
 

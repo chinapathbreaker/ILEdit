@@ -103,7 +103,8 @@ namespace ILEdit.Injection
                         case TokenType.Assembly:
                             return true;
                         case TokenType.TypeDef:
-                            return ((TypeDefinition)x).IsClass;
+                            var type = (TypeDefinition)x;
+                            return !type.IsValueType && !type.IsInterface && !(type.BaseType != null && type.BaseType.FullName == typeof(MulticastDelegate).FullName);
                         default:
                             return false;
                     }
@@ -130,7 +131,7 @@ namespace ILEdit.Injection
                         case TokenType.Assembly:
                             return true;
                         case TokenType.TypeDef:
-                            return ((TypeDefinition)x).IsValueType || !((TypeDefinition)x).IsEnum;
+                            return ((TypeDefinition)x).IsValueType && !((TypeDefinition)x).IsEnum;
                         default:
                             return false;
                     }

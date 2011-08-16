@@ -50,6 +50,7 @@
     <Compile Include="ContextMenu\InjectExistingEntry.cs" />
     <Compile Include="ContextMenu\InjectNewEntry.cs" />
     <Compile Include="ContextMenu\RemoveEntry.cs" />
+    <Compile Include="ContextMenu\RenameEntry.cs" />
     <Compile Include="ContextMenu\SaveEntry.cs" />
     <Compile Include="Injection\GlobalContainer.cs" />
     <Compile Include="Injection\Injector.cs" />
@@ -98,6 +99,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\Delete.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Rename.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
