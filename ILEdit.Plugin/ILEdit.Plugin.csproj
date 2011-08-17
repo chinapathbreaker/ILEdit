@@ -53,6 +53,7 @@
     <Compile Include="ContextMenu\RenameEntry.cs" />
     <Compile Include="ContextMenu\SaveEntry.cs" />
     <Compile Include="GlobalContainer.cs" />
+    <Compile Include="ILEditTreeNode.cs" />
     <Compile Include="Injection\Injector.cs" />
     <Compile Include="Injection\Injectors\ClassInjector.cs" />
     <Compile Include="Injection\InjectWindow\InjectWindow.xaml.cs">
@@ -67,6 +68,10 @@
     <Compile Include="RelayCommand.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ICSharpCode.Decompiler\ICSharpCode.Decompiler.csproj">
+      <Project>{984CC812-9470-4A13-AFF9-CC44068D666C}</Project>
+      <Name>ICSharpCode.Decompiler</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ILSpy\ILSpy.csproj">
       <Project>{1E85EFF9-E370-4683-83E4-8A3D063FF791}</Project>
       <Name>ILSpy</Name>
