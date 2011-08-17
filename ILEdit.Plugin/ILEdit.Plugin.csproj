@@ -56,6 +56,7 @@
     <Compile Include="ILEditTreeNode.cs" />
     <Compile Include="Injection\Injector.cs" />
     <Compile Include="Injection\Injectors\ClassInjector.cs" />
+    <Compile Include="Injection\Injectors\TreeHelper.cs" />
     <Compile Include="Injection\InjectWindow\InjectWindow.xaml.cs">
       <DependentUpon>InjectWindow.xaml</DependentUpon>
     </Compile>

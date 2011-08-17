@@ -60,10 +60,14 @@ namespace ILEdit.Injection.Injectors
 
         public void Inject(ICSharpCode.ILSpy.TreeNodes.ILSpyTreeNode node, string name)
         {
+            //Name and namespace
+            var typeName = node is ModuleTreeNode ? (name.Substring(name.Contains(".") ? name.LastIndexOf('.') + 1 : 0)) : name;
+            var typeNamespace = node is ModuleTreeNode ? (name.Substring(0, name.Contains(".") ? name.LastIndexOf('.') : 0)) : string.Empty;
+
             //Creates a new class definition
-            var c = new TypeDefinition(
-                node is ModuleTreeNode ? (name.Substring(0, name.Contains(".") ? name.LastIndexOf('.') : 0)) : string.Empty,
-                node is ModuleTreeNode ? (name.Substring(name.Contains(".") ? name.LastIndexOf('.') + 1 : 0)) : name,
+            var c = new TypeDefinition (
+                typeNamespace,
+                typeName,
                 TypeAttributes.Class | TypeAttributes.Public
             ) {
                 IsClass = true,
@@ -73,9 +77,32 @@ namespace ILEdit.Injection.Injectors
             //Checks if the node is a module or not
             if (node is ModuleTreeNode)
             {
-                //Injects the module
-                var module = ((ModuleTreeNode)node).Module;
+                //Module node
+                var moduleNode = (ModuleTreeNode)node;
+
+                //Injects in the module
+                var module = moduleNode.Module;
                 module.Types.Add(c);
+
+                //Checks for the namespace
+                var namespaceNode =
+                    moduleNode.Children
+                    .OfType<NamespaceTreeNode>()
+                    .FirstOrDefault(x => x.Text.ToString().ToLower() == (string.IsNullOrEmpty(typeNamespace) ? "-" : typeNamespace.ToLower()));
+                if (namespaceNode != null)
+                {
+                    //Adds the node to the namespace
+                    namespaceNode.Children.Add(new ILEditTreeNode(c, false));
+                    TreeHelper.SortChildren(namespaceNode);
+                }
+                else
+                {
+                    //Creates a new namespace containing the new type and adds it to the module node
+                    namespaceNode = new NamespaceTreeNode(typeNamespace);
+                    namespaceNode.Children.Add(new ILEditTreeNode(c, false));
+                    moduleNode.Children.Add(namespaceNode);
+                    TreeHelper.SortChildren(moduleNode);
+                }
             }
             else
             {
@@ -86,6 +113,10 @@ namespace ILEdit.Injection.Injectors
                 //Injects in the type
                 var type = (TypeDefinition)((IMemberTreeNode)node).Member;
                 type.NestedTypes.Add(c);
+
+                //Adds a node to the tree
+                node.Children.Add(new ILEditTreeNode(c, false));
+                TreeHelper.SortChildren((TypeTreeNode)node);
             }
         }
     }
