@@ -160,7 +160,7 @@
 			</TabControl>
 		</Border>
 		<TextBlock TextWrapping="Wrap" d:LayoutOverrides="Width, Height" Grid.Row="2" VerticalAlignment="Center" Margin="5,0,15,0"><Run Language="it-it" Text="Name:"/></TextBlock>
-        <TextBox Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsSelected, ElementName=TabInjectNew}" TextWrapping="Wrap" d:LayoutOverrides="Width, Height" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Margin="5">
+        <TextBox Name="TxtName" Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsSelected, ElementName=TabInjectNew}" TextWrapping="Wrap" d:LayoutOverrides="Width, Height" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Margin="5">
             <TextBox.InputBindings>
                 <KeyBinding Key="Enter" Command="{Binding InjectCommand}" />
             </TextBox.InputBindings>

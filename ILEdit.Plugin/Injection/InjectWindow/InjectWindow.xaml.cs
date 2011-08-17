@@ -24,6 +24,7 @@ namespace ILEdit.Injection
         {
             this.DataContext = new InjectWindowViewModel(node, this) { TabSelectedIndex = tabSelectedIndex, InjectExistingEnabled = injectExistingEnabled };
             InitializeComponent();
+            this.Loaded += (_, __) => TxtName.Focus();
         }
     }
 }
