@@ -57,6 +57,7 @@
     <Compile Include="Injection\Injector.cs" />
     <Compile Include="Injection\Injectors\ClassInjector.cs" />
     <Compile Include="Injection\Injectors\DelegateInjector.cs" />
+    <Compile Include="Injection\Injectors\InterfaceInjector.cs" />
     <Compile Include="Injection\Injectors\StructInjector.cs" />
     <Compile Include="Injection\Injectors\TreeHelper.cs" />
     <Compile Include="Injection\InjectWindow\InjectWindow.xaml.cs">

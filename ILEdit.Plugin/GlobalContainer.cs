@@ -24,7 +24,8 @@ namespace ILEdit
             Injectors = new List<IInjector>() { 
                 new ClassInjector(),
                 new StructInjector(),
-                new DelegateInjector()
+                new DelegateInjector(),
+                new InterfaceInjector()
             };
         }
 
