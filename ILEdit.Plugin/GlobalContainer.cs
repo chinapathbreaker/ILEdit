@@ -25,7 +25,8 @@ namespace ILEdit
                 new ClassInjector(),
                 new StructInjector(),
                 new DelegateInjector(),
-                new InterfaceInjector()
+                new InterfaceInjector(),
+                new EnumInjector()
             };
         }
 
