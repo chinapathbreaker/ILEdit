@@ -5,6 +5,7 @@ using System.Text;
 using ICSharpCode.ILSpy;
 using ICSharpCode.ILSpy.TreeNodes;
 using Mono.Cecil;
+using ICSharpCode.TreeView;
 
 namespace ILEdit.Injection.Injectors
 {
@@ -13,6 +14,52 @@ namespace ILEdit.Injection.Injectors
     /// </summary>
     internal static class TreeHelper
     {
+        #region GetModuleNode
+
+        /// <summary>
+        /// Returns the ancestor of type ModuleTreeNode of the given node
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        public static ModuleTreeNode GetModuleNode(SharpTreeNode node)
+        {
+            ModuleTreeNode moduleNode = null;
+            SharpTreeNode currentNode = node;
+            while (moduleNode == null)
+            {
+                if (currentNode.Parent == null)
+                    break;
+                currentNode = currentNode.Parent;
+                moduleNode = currentNode as ModuleTreeNode;
+            }
+            return moduleNode;
+        }
+
+        #endregion
+
+        #region GetAssemblyNode
+
+        /// <summary>
+        /// Returns the ancestor of type AssemblyTreeNode of the given node
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        public static AssemblyTreeNode GetAssemblyNode(SharpTreeNode node)
+        {
+            AssemblyTreeNode moduleNode = null;
+            SharpTreeNode currentNode = node;
+            while (moduleNode == null)
+            {
+                if (currentNode.Parent == null)
+                    break;
+                currentNode = currentNode.Parent;
+                moduleNode = currentNode as AssemblyTreeNode;
+            }
+            return moduleNode;
+        }
+
+        #endregion
+
         #region SortChildren
 
         /// <summary>
@@ -26,6 +73,28 @@ namespace ILEdit.Injection.Injectors
                 node.Children
                 .GroupBy(x => x is NamespaceTreeNode)
                 .OrderBy(x => x.Key)
+                .SelectMany(x => x.OrderBy(y => y.Text.ToString()))
+                .ToArray();
+
+            //Clears the children
+            node.Children.Clear();
+
+            //Readds the children
+            foreach (var x in ordered)
+                node.Children.Add(x);
+        }
+
+        /// <summary>
+        /// Sorts the children of a ReferenceFolderTreeNode
+        /// </summary>
+        /// <param name="node"></param>
+        public static void SortChildren(ReferenceFolderTreeNode node)
+        {
+            //Groups the children by type and performs ordering
+            var ordered =
+                node.Children
+                .GroupBy(x => x is AssemblyReferenceTreeNode)
+                .OrderByDescending(x => x.Key)
                 .SelectMany(x => x.OrderBy(y => y.Text.ToString()))
                 .ToArray();
 

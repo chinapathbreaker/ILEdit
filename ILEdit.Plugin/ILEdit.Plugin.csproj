@@ -55,6 +55,7 @@
     <Compile Include="GlobalContainer.cs" />
     <Compile Include="ILEditTreeNode.cs" />
     <Compile Include="Injection\Injector.cs" />
+    <Compile Include="Injection\Injectors\AssemblyReferenceInjector.cs" />
     <Compile Include="Injection\Injectors\ClassInjector.cs" />
     <Compile Include="Injection\Injectors\DelegateInjector.cs" />
     <Compile Include="Injection\Injectors\EnumInjector.cs" />
