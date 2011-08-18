@@ -101,6 +101,9 @@ namespace ILEdit.Injection.Injectors
         /// <param name="afterEnclosingType">Action to call when the enclosing type is available</param>
         public static void AddTreeNode(ILSpyTreeNode node, TypeDefinition type, Action<ModuleDefinition> afterModule, Action<TypeDefinition> afterEnclosingType)
         {
+            //Ensures the lazy children of the node
+            node.EnsureLazyChildren();
+
             //Checks if the node is a module or not
             if (node is ModuleTreeNode)
             {

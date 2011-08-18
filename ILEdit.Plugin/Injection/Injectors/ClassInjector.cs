@@ -73,11 +73,11 @@ namespace ILEdit.Injection.Injectors
             }
 
             //Creates a new class definition
-            var c = new TypeDefinition (
+            var c = new TypeDefinition(
                 typeNamespace,
                 typeName,
                 TypeAttributes.Class | TypeAttributes.Public
-            ) {
+            ) { 
                 IsClass = true,
                 IsPublic = true
             };

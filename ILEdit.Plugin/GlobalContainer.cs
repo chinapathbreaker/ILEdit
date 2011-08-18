@@ -23,7 +23,8 @@ namespace ILEdit
             //Adds the injectors
             Injectors = new List<IInjector>() { 
                 new ClassInjector(),
-                new StructInjector()
+                new StructInjector(),
+                new DelegateInjector()
             };
         }
 

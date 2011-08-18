@@ -73,12 +73,11 @@ namespace ILEdit.Injection.Injectors
                 typeNamespace,
                 typeName,
                 TypeAttributes.Class | TypeAttributes.SequentialLayout | TypeAttributes.Sealed | TypeAttributes.Public
-            ) {
+            ) { 
                 IsClass = true,
                 IsPublic = true,
-                IsValueType = true,
-                IsSealed = true,
-                IsSequentialLayout = true
+                IsSequentialLayout = true,
+                IsSealed = true
             };
 
             //Adds the type
