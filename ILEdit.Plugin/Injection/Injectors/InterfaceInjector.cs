@@ -23,7 +23,7 @@ namespace ILEdit.Injection.Injectors
 
         public string Description
         {
-            get { return "Injects a new interface"; }
+            get { return "Injects a new empty interface"; }
         }
 
         public System.Windows.Media.ImageSource Icon
@@ -79,12 +79,7 @@ namespace ILEdit.Injection.Injectors
                 TypeAttributes.Class | TypeAttributes.Interface | TypeAttributes.Public | TypeAttributes.AutoClass | TypeAttributes.AnsiClass | TypeAttributes.Abstract
             )
             {
-                IsClass = true,
-                IsInterface = true,
-                IsPublic = true,
-                IsAutoClass = true,
                 IsAnsiClass = true,
-                IsAbstract = true
             };
 
             //Adds to the node

@@ -19,7 +19,7 @@ namespace ILEdit.Injection.Injectors
 
         public string Description
         {
-            get { return "Injects a new delegate"; }
+            get { return "Injects a new delegate and the relative methods .ctor, Invoke, BeginInvoke, and EndInvoke"; }
         }
 
         public System.Windows.Media.ImageSource Icon
@@ -75,12 +75,7 @@ namespace ILEdit.Injection.Injectors
                 TypeAttributes.Class | TypeAttributes.AutoClass | TypeAttributes.AnsiClass | TypeAttributes.Sealed | TypeAttributes.Public
             )
             {
-                IsClass = true,
-                IsPublic = true,
-                IsValueType = true,
-                IsSealed = true,
-                IsAutoClass = true,
-                IsAnsiClass = true
+                IsAnsiClass = true,
             };
 
             //Module

@@ -19,7 +19,7 @@ namespace ILEdit.Injection.Injectors
 
         public string Description
         {
-            get { return "Injects a new structure"; }
+            get { return "Injects a new empty structure"; }
         }
 
         public System.Windows.Media.ImageSource Icon
@@ -73,12 +73,7 @@ namespace ILEdit.Injection.Injectors
                 typeNamespace,
                 typeName,
                 TypeAttributes.Class | TypeAttributes.SequentialLayout | TypeAttributes.Sealed | TypeAttributes.Public
-            ) { 
-                IsClass = true,
-                IsPublic = true,
-                IsSequentialLayout = true,
-                IsSealed = true
-            };
+            );
 
             //Adds the type
             TreeHelper.AddTreeNode(node, c,

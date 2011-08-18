@@ -23,7 +23,7 @@ namespace ILEdit.Injection.Injectors
 
         public string Description
         {
-            get { return "Injects a new class"; }
+            get { return "Injects a new empty class"; }
         }
 
         public System.Windows.Media.ImageSource Icon
@@ -77,10 +77,7 @@ namespace ILEdit.Injection.Injectors
                 typeNamespace,
                 typeName,
                 TypeAttributes.Class | TypeAttributes.Public
-            ) { 
-                IsClass = true,
-                IsPublic = true
-            };
+            );
 
             //Adds to the node
             TreeHelper.AddTreeNode(node, c, null, null);

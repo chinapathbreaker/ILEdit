@@ -145,7 +145,7 @@
 							<ColumnDefinition Width="Auto"/>
 						</Grid.ColumnDefinitions>
                         <ListBox Name="LstInjectors" ItemsSource="{Binding Injectors}" SelectedItem="{Binding SelectedInjector, Mode=TwoWay}" ItemTemplate="{DynamicResource InjectorTemplate}" ItemContainerStyle="{DynamicResource ListBoxItemStyle1}" BorderThickness="0,0,1,0" Margin="0" Padding="0,0,5,0" SelectedIndex="0"/>
-                            <ContentControl Content="{Binding SelectedItem.Description, ElementName=LstInjectors}" Grid.Column="1" Width="200" Margin="5"/>
+                            <TextBlock Text="{Binding SelectedItem.Description, ElementName=LstInjectors}" TextWrapping="Wrap" Grid.Column="1" Width="200" Margin="5"/>
 					</Grid>
 				</TabItem>
 				<TabItem IsEnabled="{Binding InjectExistingEnabled}">
