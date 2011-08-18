@@ -13,9 +13,9 @@ using System.Windows.Media;
 namespace ILEdit
 {
     /// <summary>
-    /// Node which represents a member. It can auto-fill its children of they can be filled manually. A predicate determines which items to show if the children are automatically determined.
+    /// Node which represents a member. It can auto-fill its children or they can be filled manually. A predicate determines which items to show if the children are automatically determined.
     /// </summary>
-    internal class ILEditTreeNode : ILSpyTreeNode
+    internal class ILEditTreeNode : ILSpyTreeNode, IMemberTreeNode
     {
         private IMetadataTokenProvider _tokenProvider;
         private Language language;
@@ -54,9 +54,27 @@ namespace ILEdit
         }
 
         /// <summary>
+        /// Returns the MemberReference represented by this node
+        /// </summary>
+        public MemberReference Member
+        {
+            get { return TokenProvider as MemberReference; }
+        }
+
+        /// <summary>
         /// Gets or sets the predicate used to filter the children of this node
         /// </summary>
         public Predicate<IMetadataTokenProvider> ChildrenFilter { get; set; }
+
+        /// <summary>
+        /// Ensures the children are always ready (avoids showing the expander icon when there are no children)
+        /// </summary>
+        protected override void OnExpanding()
+        {
+            base.OnExpanding();
+            foreach (var x in Children)
+                x.EnsureLazyChildren();
+        }
 
         /// <summary>
         /// Loads the children
@@ -116,7 +134,7 @@ namespace ILEdit
 
             //Adds the children
             foreach (var x in children)
-                this.Children.Add(new ILEditTreeNode(x, false) { ChildrenFilter = this.ChildrenFilter });
+                this.Children.Add(new ILEditTreeNode(x, false) { ChildrenFilter = this.ChildrenFilter, ForegroundColor = this.ForegroundColor });
         }
 
         /// <summary>
@@ -219,6 +237,5 @@ namespace ILEdit
                     break;
             }
         }
-
     }
 }

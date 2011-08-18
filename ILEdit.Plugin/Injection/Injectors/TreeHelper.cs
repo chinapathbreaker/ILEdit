@@ -133,18 +133,18 @@ namespace ILEdit.Injection.Injectors
         public static void SortChildren(TypeTreeNode node)
         {
             //Array for the type ordering
-            var typeOrder = new List<Type>(new Type[] {
-                typeof(TypeTreeNode),
-                typeof(FieldTreeNode),
-                typeof(PropertyTreeNode),
-                typeof(EventTreeNode),
-                typeof(MethodTreeNode)
+            var typeOrder = new List<TokenType>(new TokenType[] {
+                TokenType.TypeDef,
+                TokenType.Field,
+                TokenType.Property,
+                TokenType.Event,
+                TokenType.Method
             });
 
             //Groups the childen by type
             var ordered =
                 node.Children
-                .GroupBy(x => typeOrder.IndexOf(x.GetType()))
+                .GroupBy(x => x is IMemberTreeNode ? typeOrder.IndexOf(((IMemberTreeNode)x).Member.MetadataToken.TokenType) : -1)
                 .OrderBy(x => x.Key)
                 .SelectMany(x => x.OrderBy(y => y.Text.ToString()))
                 .ToArray();

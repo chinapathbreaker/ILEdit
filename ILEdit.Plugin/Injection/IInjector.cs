@@ -40,6 +40,11 @@ namespace ILEdit.Injection
         Predicate<IMetadataTokenProvider> MemberFilter { get; }
 
         /// <summary>
+        /// Returns a TokenType representing the members that the user can choose (if NeedsType is true)
+        /// </summary>
+        TokenType SelectableMembers { get; }
+
+        /// <summary>
         /// Determines if this injector can inject in the given node
         /// </summary>
         /// <param name="node"></param>
@@ -51,6 +56,7 @@ namespace ILEdit.Injection
         /// </summary>
         /// <param name="node">Destination node</param>
         /// <param name="name">Name of the new object to inject</param>
-        void Inject(ILSpyTreeNode node, string name);
+        /// <param name="member">Member selected by the user (null if NeedsMember is false)</param>
+        void Inject(ILSpyTreeNode node, string name, IMetadataTokenProvider member);
     }
 }

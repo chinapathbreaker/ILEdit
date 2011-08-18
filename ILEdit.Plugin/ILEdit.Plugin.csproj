@@ -52,13 +52,15 @@
     <Compile Include="ContextMenu\RemoveEntry.cs" />
     <Compile Include="ContextMenu\RenameEntry.cs" />
     <Compile Include="ContextMenu\SaveEntry.cs" />
+    <Compile Include="Converters\AllTrueMultiConverter.cs" />
     <Compile Include="GlobalContainer.cs" />
     <Compile Include="ILEditTreeNode.cs" />
-    <Compile Include="Injection\Injector.cs" />
+    <Compile Include="Injection\IInjector.cs" />
     <Compile Include="Injection\Injectors\AssemblyReferenceInjector.cs" />
     <Compile Include="Injection\Injectors\ClassInjector.cs" />
     <Compile Include="Injection\Injectors\DelegateInjector.cs" />
     <Compile Include="Injection\Injectors\EnumInjector.cs" />
+    <Compile Include="Injection\Injectors\FieldInjector.cs" />
     <Compile Include="Injection\Injectors\InterfaceInjector.cs" />
     <Compile Include="Injection\Injectors\StructInjector.cs" />
     <Compile Include="Injection\Injectors\TreeHelper.cs" />
@@ -67,6 +69,13 @@
     </Compile>
     <Compile Include="Injection\InjectWindow\InjectWindowViewModel.cs" />
     <Compile Include="Injection\MemberFilters.cs" />
+    <Compile Include="MemberSelection\SelectMemberBox.xaml.cs">
+      <DependentUpon>SelectMemberBox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MemberSelection\SelectMemberControl.cs" />
+    <Compile Include="MemberSelection\SelectMemberWindow.xaml.cs">
+      <DependentUpon>SelectMemberWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="InputBox.xaml.cs">
       <DependentUpon>InputBox.xaml</DependentUpon>
     </Compile>
@@ -100,6 +109,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="MemberSelection\SelectMemberBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MemberSelection\SelectMemberWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="InputBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -114,6 +131,7 @@
   <ItemGroup>
     <Resource Include="Images\Rename.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

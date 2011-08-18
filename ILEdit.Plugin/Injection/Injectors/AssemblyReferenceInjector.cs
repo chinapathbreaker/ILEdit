@@ -37,8 +37,13 @@ namespace ILEdit.Injection.Injectors
 
         public Predicate<Mono.Cecil.IMetadataTokenProvider> MemberFilter
         {
-            get { throw new NotImplementedException(); }
-        } 
+            get { return null; }
+        }
+
+        public TokenType SelectableMembers
+        {
+            get { return TokenType.TypeDef; }
+        }
 
         #endregion
 
@@ -48,7 +53,7 @@ namespace ILEdit.Injection.Injectors
             return node is ReferenceFolderTreeNode;
         }
 
-        public void Inject(ICSharpCode.ILSpy.TreeNodes.ILSpyTreeNode node, string name)
+        public void Inject(ICSharpCode.ILSpy.TreeNodes.ILSpyTreeNode node, string name, IMetadataTokenProvider member)
         {
             //Gets the parent module
             var moduleNode = TreeHelper.GetModuleNode(node);

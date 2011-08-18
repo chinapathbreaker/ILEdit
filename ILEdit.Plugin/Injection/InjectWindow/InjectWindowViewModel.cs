@@ -6,6 +6,7 @@ using ICSharpCode.ILSpy.TreeNodes;
 using System.Windows.Media;
 using System.ComponentModel;
 using System.Windows;
+using Mono.Cecil;
 
 namespace ILEdit.Injection
 {
@@ -55,6 +56,11 @@ namespace ILEdit.Injection
         public IInjector SelectedInjector { get; set; }
 
         /// <summary>
+        /// Gets or sets the member selected by the user (if needed to the injector)
+        /// </summary>
+        public IMetadataTokenProvider SelectedMember { get; set; }
+
+        /// <summary>
         /// Gets or sets the name given by the user
         /// </summary>
         public string Name { get; set; }
@@ -89,8 +95,15 @@ namespace ILEdit.Injection
                         return;
                     }
 
+                    //Checks that the member has been provided (if needed)
+                    if (SelectedInjector.NeedsMember && SelectedMember == null)
+                    {
+                        MessageBox.Show("A type is required", "Type required", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+
                     //Injects
-                    this.SelectedInjector.Inject(_node, this.Name);
+                    this.SelectedInjector.Inject(_node, this.Name, this.SelectedInjector.NeedsMember ? this.SelectedMember : null);
                     break;
                
                 //Inject existing

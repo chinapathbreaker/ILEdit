@@ -22,12 +22,17 @@ namespace ILEdit
 
             //Adds the injectors
             Injectors = new List<IInjector>() { 
+                
                 new AssemblyReferenceInjector(),
+                
                 new ClassInjector(),
                 new StructInjector(),
                 new DelegateInjector(),
                 new InterfaceInjector(),
-                new EnumInjector()
+                new EnumInjector(),
+
+                new FieldInjector()
+
             };
         }
 

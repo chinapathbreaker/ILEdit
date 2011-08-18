@@ -1,0 +1,32 @@
+﻿<Control x:Class="ILEdit.SelectMemberBox"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+			 xmlns:local="clr-namespace:ILEdit"
+             mc:Ignorable="d" 
+             d:DesignHeight="26" d:DesignWidth="459">
+    
+    <Control.Template>
+        <ControlTemplate>
+            <Grid Margin="5,0">
+                <Rectangle Margin="-5,0" Fill="White" Stroke="#FFE3E9EF" />
+                <TextBlock Name="LblWatermark" Text="Click here to choose" VerticalAlignment="Center" HorizontalAlignment="Left" FontStyle="Italic" Foreground="Gray" />
+                <Image Name="ImgIcon" HorizontalAlignment="Left" VerticalAlignment="Center" Width="16" Height="16" Visibility="Collapsed" />
+                <TextBlock Name="LblName" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="21,0,0,0" Visibility="Collapsed" />
+                <Rectangle Name="DisabledVisual" Margin="-5,0" Fill="#FFF4F4F4" Stroke="#FFADB2B5" Visibility="Collapsed" />
+            </Grid>
+            <ControlTemplate.Triggers>
+                <Trigger Property="local:SelectMemberBox.HasMember" Value="True">
+                    <Setter TargetName="LblWatermark" Property="UIElement.Visibility" Value="Collapsed" />
+                    <Setter TargetName="ImgIcon" Property="UIElement.Visibility" Value="Visible" />
+                    <Setter TargetName="LblName" Property="UIElement.Visibility" Value="Visible" />
+                </Trigger>
+                <Trigger Property="UIElement.IsEnabled" Value="False">
+                    <Setter TargetName="DisabledVisual" Property="UIElement.Visibility" Value="Visible" />
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+    </Control.Template>
+    
+</Control>
