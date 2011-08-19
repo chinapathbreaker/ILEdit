@@ -33,6 +33,7 @@ namespace ILEdit
                 new EnumInjector(),
 
                 new FieldInjector(),
+                new MethodInjector(),
                 new PropertyInjector()
 
             };
