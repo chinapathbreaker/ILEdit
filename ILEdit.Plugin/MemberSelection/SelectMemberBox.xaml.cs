@@ -105,10 +105,26 @@ namespace ILEdit
 
         #endregion
 
+        #region DestinationModule property
+
+
+        public ModuleDefinition DestinationModule
+        {
+            get { return (ModuleDefinition)GetValue(DestinationModuleProperty); }
+            set { SetValue(DestinationModuleProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for DestinationModule.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty DestinationModuleProperty =
+            DependencyProperty.Register("DestinationModule", typeof(ModuleDefinition), typeof(SelectMemberBox), new PropertyMetadata(null));
+
+        
+        #endregion
+
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
             //Shows the member selection window
-            var win = new SelectMemberWindow(MemberFilter, SelectableMembers);
+            var win = new SelectMemberWindow(MemberFilter, SelectableMembers, DestinationModule);
             if (win.ShowDialog().GetValueOrDefault(false))
             {
                 //Sets icon and text using an ILEditTreeNode

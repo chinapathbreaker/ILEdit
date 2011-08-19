@@ -16,8 +16,9 @@ namespace ILEdit
             this.Root = new SharpTreeNode();
             this.ShowRoot = false;
             this.Loaded += (_, __) => {
-                foreach (var asm in ICSharpCode.ILSpy.MainWindow.Instance.CurrentAssemblyList.GetAssemblies())
-                    Root.Children.Add(new ILEditTreeNode(asm.AssemblyDefinition, false) { ChildrenFilter = MemberFilter, ForegroundColor = Colors.Black });
+                if (ICSharpCode.ILSpy.MainWindow.Instance != null)
+                    foreach (var asm in ICSharpCode.ILSpy.MainWindow.Instance.CurrentAssemblyList.GetAssemblies())
+                        Root.Children.Add(new ILEditTreeNode(asm.AssemblyDefinition, false) { ChildrenFilter = MemberFilter, ForegroundColor = Colors.Black });
             };
         }
 

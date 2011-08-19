@@ -28,12 +28,21 @@ namespace ILEdit.Injection
             InjectInIcon = (ImageSource)node.Icon;
             InjectInContent = node.Text;
 
+            //Finds the module
+            var moduleNode = ILEdit.Injection.Injectors.TreeHelper.GetModuleNode(node);
+            DestinationModule = moduleNode == null ? null : moduleNode.Module;
+
             //Prepares the commands
             _InjectCommand = new RelayCommand(InjectCommandImpl);
         }
         #endregion
 
         #region Properties
+
+        /// <summary>
+        /// Returns the module destination of the injection
+        /// </summary>
+        public ModuleDefinition DestinationModule { get; private set; }
 
         /// <summary>
         /// Returns a list of all the injectors available for the given node
@@ -99,6 +108,13 @@ namespace ILEdit.Injection
                     if (SelectedInjector.NeedsMember && SelectedMember == null)
                     {
                         MessageBox.Show("A type is required", "Type required", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+
+                    //Checks that the selected type is valid
+                    if (SelectedInjector.NeedsMember && !SelectedInjector.MemberFilter(this.SelectedMember))
+                    {
+                        MessageBox.Show("The selected type is not valid for '" + this.SelectedInjector.Name + "'", "Type required", MessageBoxButton.OK, MessageBoxImage.Error);
                         return;
                     }
 
