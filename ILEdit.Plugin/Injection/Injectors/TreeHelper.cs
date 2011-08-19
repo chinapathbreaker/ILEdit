@@ -219,7 +219,10 @@ namespace ILEdit.Injection.Injectors
 
                 //Adds a node to the tree
                 node.Children.Add(new ILEditTreeNode(type, false));
-                TreeHelper.SortChildren((TypeTreeNode)node);
+                if (node is ILEditTreeNode)
+                    ((ILEditTreeNode)node).RefreshChildren();
+                else
+                    TreeHelper.SortChildren((TypeTreeNode)node);
             }
         }
 

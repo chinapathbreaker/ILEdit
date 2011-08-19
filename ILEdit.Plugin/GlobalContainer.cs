@@ -5,6 +5,7 @@ using System.Text;
 using System.Windows.Media;
 using ILEdit.Injection;
 using ILEdit.Injection.Injectors;
+using Mono.Cecil;
 
 namespace ILEdit
 {
@@ -31,7 +32,8 @@ namespace ILEdit
                 new InterfaceInjector(),
                 new EnumInjector(),
 
-                new FieldInjector()
+                new FieldInjector(),
+                new PropertyInjector()
 
             };
         }
@@ -53,6 +55,31 @@ namespace ILEdit
         /// Returns the color used to identify the edited nodes
         /// </summary>
         public static Color ModifiedNodesColor { get; private set; }
+
+        #endregion
+
+        #region GetFreeRID
+
+        private static Dictionary<ModuleDefinition, int> _ridCache = new Dictionary<ModuleDefinition, int>();
+
+        /// <summary>
+        /// Returns the first free RID for the given module
+        /// </summary>
+        /// <param name="module"></param>
+        /// <returns></returns>
+        public static int GetFreeRID(ModuleDefinition module)
+        {
+            int ret;
+            if (_ridCache.TryGetValue(module, out ret))
+            {
+                return (_ridCache[module] = (ret + 1));
+            }
+            else
+            {
+                _ridCache.Add(module, ret = (module.GetMemberReferences().Count() + 1));
+                return ret;
+            }
+        }
 
         #endregion
     }

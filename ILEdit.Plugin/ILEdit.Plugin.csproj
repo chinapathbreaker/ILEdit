@@ -62,6 +62,7 @@
     <Compile Include="Injection\Injectors\EnumInjector.cs" />
     <Compile Include="Injection\Injectors\FieldInjector.cs" />
     <Compile Include="Injection\Injectors\InterfaceInjector.cs" />
+    <Compile Include="Injection\Injectors\PropertyInjector.cs" />
     <Compile Include="Injection\Injectors\StructInjector.cs" />
     <Compile Include="Injection\Injectors\TreeHelper.cs" />
     <Compile Include="Injection\InjectWindow\InjectWindow.xaml.cs">

@@ -104,6 +104,7 @@ namespace ILEdit.Injection
 
                     //Injects
                     this.SelectedInjector.Inject(_node, this.Name, this.SelectedInjector.NeedsMember ? this.SelectedMember : null);
+                    ICSharpCode.ILSpy.MainWindow.Instance.RefreshDecompiledView();
                     break;
                
                 //Inject existing

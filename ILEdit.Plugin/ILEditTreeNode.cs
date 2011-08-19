@@ -101,7 +101,7 @@ namespace ILEdit
                 children =
                     type.NestedTypes.Cast<IMetadataTokenProvider>()
                     .Concat(type.Fields)
-                    .Concat(type.Methods)
+                    .Concat(type.Methods.Where(x => !(x.IsGetter || x.IsSetter || x.IsAddOn || x.IsRemoveOn || x.IsFire)))
                     .Concat(type.Properties)
                     .Concat(type.Events);
             }
@@ -135,6 +135,20 @@ namespace ILEdit
             //Adds the children
             foreach (var x in children)
                 this.Children.Add(new ILEditTreeNode(x, false) { ChildrenFilter = this.ChildrenFilter, ForegroundColor = this.ForegroundColor });
+        }
+
+        /// <summary>
+        /// Forces a complete refresh of all the children (if automatically filled)
+        /// </summary>
+        public void RefreshChildren()
+        {
+            if (!_manuallyFilledChildren)
+            {
+                this.Children.Clear();
+                LoadChildren();
+                foreach (var x in Children)
+                    x.EnsureLazyChildren();
+            }
         }
 
         /// <summary>
