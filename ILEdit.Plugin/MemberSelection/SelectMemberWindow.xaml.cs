@@ -13,6 +13,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Mono.Cecil;
 using ICSharpCode.TreeView;
+using ICSharpCode.ILSpy;
+using System.Xml.Linq;
 
 namespace ILEdit
 {
@@ -36,10 +38,16 @@ namespace ILEdit
             Tuple.Create("System", "Func`2")
         };
 
+        private XElement _recentMembersNode;
+        private ModuleDefinition _destinationModule;
+
+        private const int MAX_RECENT_MEMBERS_COUNT = 5;
+
         public SelectMemberWindow(Predicate<IMetadataTokenProvider> filter, TokenType token, ModuleDefinition destinationModule)
         {
             //Initializes the components
             InitializeComponent();
+            _destinationModule = destinationModule;
 
             //Sets the filter
             tree.MemberFilter = filter;
@@ -62,6 +70,27 @@ namespace ILEdit
                         this.SelectedMember = node.TokenProvider;
                         BtnOk.IsEnabled = true;
                         tree.SelectedIndex = -1;
+                        LstRecentTypes.SelectedIndex = -1;
+                        ImgSelectedMember.Source = (ImageSource)node.Icon;
+                        ContentSelectedMember.Content = node.Text;
+                    }
+                };
+            }
+
+            //Prepares the recent types
+            var recentTypes = GetRecentMembers();
+            if (recentTypes.Length > 0)
+            {
+                LstRecentTypes.ItemsSource = recentTypes.Select(x => new ILEditTreeNode(x, true));
+                LstRecentTypes.SelectionChanged += (_, e) =>
+                {
+                    if (e.AddedItems.Count == 1)
+                    {
+                        var node = ((ILEditTreeNode)e.AddedItems[0]);
+                        this.SelectedMember = node.TokenProvider;
+                        BtnOk.IsEnabled = true;
+                        tree.SelectedIndex = -1;
+                        LstCommonTypes.SelectedIndex = -1;
                         ImgSelectedMember.Source = (ImageSource)node.Icon;
                         ContentSelectedMember.Content = node.Text;
                     }
@@ -75,6 +104,7 @@ namespace ILEdit
                     this.SelectedMember = tree.SelectedMember;
                     BtnOk.IsEnabled = true;
                     LstCommonTypes.SelectedIndex = -1;
+                    LstRecentTypes.SelectedIndex = -1;
                     var node = (SharpTreeNode)tree.SelectedItem;
                     ImgSelectedMember.Source = (ImageSource)node.Icon;
                     ContentSelectedMember.Content = node.Text;
@@ -82,8 +112,69 @@ namespace ILEdit
             };
         }
 
+        private MemberReference[] GetRecentMembers()
+        {
+            //Return value
+            var ret = new List<MemberReference>();
+
+            //Gets the settings node
+            _recentMembersNode = GlobalContainer.Settings["InjectionRecentMembers"];
+
+            //Array containing the loaded assemblies
+            var asms =
+                MainWindow.Instance.CurrentAssemblyList.GetAssemblies()
+                .Where(x => x.AssemblyDefinition != null)
+                .Select(x => x.AssemblyDefinition)
+                .ToArray();
+
+            //Reiterates along the children and builds the references
+            foreach (var xel in _recentMembersNode.Elements(XName.Get("Member")))
+            {
+                var asm = asms.FirstOrDefault(x => x.FullName == xel.Attribute(XName.Get("Assembly")).Value);
+                var module = asm == null ? null : asm.Modules.FirstOrDefault(x => x.Name == xel.Attribute(XName.Get("Module")).Value);
+                var member = module == null ? null : ICSharpCode.ILSpy.XmlDoc.XmlDocKeyProvider.FindMemberByKey(module, xel.Attribute(XName.Get("Key")).Value);
+                if (member == null)
+                {
+                    xel.Remove();
+                    continue;
+                }
+                ret.Add(member);
+            }
+
+            //Return
+            return ret.ToArray();
+        }
+
         private void BtnOk_Click(object sender, RoutedEventArgs e)
         {
+            //Member
+            var member = (MemberReference)this.SelectedMember;
+
+            //Computes the key for the selected member
+            var key = ICSharpCode.ILSpy.XmlDoc.XmlDocKeyProvider.GetKey(member);
+            
+            //Removes it (if present) fro the recent list
+            var recentNode = _recentMembersNode.Elements().FirstOrDefault(x => x.Attribute(XName.Get("Key")).Value == key);
+            if (recentNode != null)
+                recentNode.Remove();
+
+            //Creates a new node and adds it to the list
+            recentNode = 
+                new XElement(XName.Get("Member"), 
+                    new XAttribute(XName.Get("Assembly"), member.Module.Assembly.FullName),
+                    new XAttribute(XName.Get("Module"), member.Module.Name),
+                    new XAttribute(XName.Get("Key"), key)
+                );
+            _recentMembersNode.AddFirst(recentNode);
+
+            //Checks if the list has excedeed the maximum allowed size
+            if (_recentMembersNode.Elements().Count() > MAX_RECENT_MEMBERS_COUNT)
+                _recentMembersNode.Elements().Last().Remove();
+
+            //Saves the settings
+            GlobalContainer.Settings.Save();
+            
+            //Returns to the caller
             this.DialogResult = true;
             this.Close();
         }

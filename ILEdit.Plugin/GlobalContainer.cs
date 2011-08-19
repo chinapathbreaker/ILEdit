@@ -6,6 +6,8 @@ using System.Windows.Media;
 using ILEdit.Injection;
 using ILEdit.Injection.Injectors;
 using Mono.Cecil;
+using ICSharpCode.ILSpy;
+using System.Xml.Linq;
 
 namespace ILEdit
 {
@@ -38,6 +40,71 @@ namespace ILEdit
                 new EventInjector()
 
             };
+        }
+
+        #endregion
+
+        #region Settings
+
+        /// <summary>
+        /// ILEdit settings manager
+        /// </summary>
+        public class SettingsManager
+        {
+            ILSpySettings settings;
+            XElement root;
+
+            #region Singleton implementation
+            
+            private SettingsManager()
+            {
+                settings = ILSpySettings.Load();
+                root = settings[XName.Get("ILEdit")];
+            }
+
+            private static SettingsManager _instance;
+            /// <summary>
+            /// Returns the only instance of the settings manager
+            /// </summary>
+            public static SettingsManager Instance {
+                get { return _instance ?? (_instance = new SettingsManager()); } 
+            }
+
+            #endregion
+
+            /// <summary>
+            /// Returns the section with the given name
+            /// </summary>
+            /// <param name="name"></param>
+            /// <returns></returns>
+            public XElement this[string name] { 
+                get 
+                {
+                    var xel = root.Element(XName.Get(name));
+                    if (xel == null)
+                    {
+                        xel = new XElement(XName.Get(name));
+                        root.Add(xel);
+                    }
+                    return xel;
+                } 
+            }
+
+            /// <summary>
+            /// Saves the settings
+            /// </summary>
+            public void Save() 
+            {
+                ILSpySettings.SaveSettings(root);
+            }
+
+        }
+
+        /// <summary>
+        /// Returns the settings of ILEdit
+        /// </summary>
+        public static SettingsManager Settings {
+            get { return SettingsManager.Instance; } 
         }
 
         #endregion
