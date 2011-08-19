@@ -60,6 +60,7 @@
     <Compile Include="Injection\Injectors\ClassInjector.cs" />
     <Compile Include="Injection\Injectors\DelegateInjector.cs" />
     <Compile Include="Injection\Injectors\EnumInjector.cs" />
+    <Compile Include="Injection\Injectors\EventInjector.cs" />
     <Compile Include="Injection\Injectors\FieldInjector.cs" />
     <Compile Include="Injection\Injectors\InterfaceInjector.cs" />
     <Compile Include="Injection\Injectors\MethodInjector.cs" />

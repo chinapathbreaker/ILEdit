@@ -34,7 +34,8 @@ namespace ILEdit
 
                 new FieldInjector(),
                 new MethodInjector(),
-                new PropertyInjector()
+                new PropertyInjector(),
+                new EventInjector()
 
             };
         }
