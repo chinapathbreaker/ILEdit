@@ -15,6 +15,8 @@ using Mono.Cecil;
 using ICSharpCode.TreeView;
 using ICSharpCode.ILSpy;
 using System.Xml.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ILEdit
 {
@@ -42,6 +44,9 @@ namespace ILEdit
         private ModuleDefinition _destinationModule;
 
         private int maxRecentMembersCount;
+
+        private CancellationToken ct;
+        private CancellationTokenSource cts;
 
         public SelectMemberWindow(Predicate<IMetadataTokenProvider> filter, TokenType token, ModuleDefinition destinationModule)
         {
@@ -146,6 +151,109 @@ namespace ILEdit
             return ret.ToArray();
         }
 
+        private void TxtSearch_KeyDown(object sender, KeyEventArgs e)
+        {
+            //Checks that the pressed key is enter
+            if (e.Key != Key.Enter)
+                return;
+
+            //Initializes the tokens
+            cts = new CancellationTokenSource();
+            ct = cts.Token;
+
+            //Shows the progress and locks the textbox
+            SearchWaitProgress.IsIndeterminate = true;
+            SearchWaitProgress.Visibility = Visibility.Visible;
+            TxtSearch.IsEnabled = false;
+
+            //Starts the research
+            var t = new Task<SharpTreeNode>(param => {
+
+                //Return node
+                SharpTreeNode ret = null;
+
+                //Extracts the nodes and the search term
+                var nodes = ((Tuple<SharpTreeNode[], string>)param).Item1;
+                var term = ((Tuple<SharpTreeNode[], string>)param).Item2.ToLower();
+
+                //Searchs the term
+                foreach (var node in PreOrder(nodes, x => { x.EnsureLazyChildren(); return x.Children; }))
+                {
+                    ct.ThrowIfCancellationRequested();
+                    if (node.Text != null && node.Text.ToString().ToLower().StartsWith(term))
+                    {
+                        ret = node;
+                        break;
+                    }
+                }
+
+                //Return
+                return ret;
+
+            }, Tuple.Create(tree.Items.Cast<SharpTreeNode>().ToArray(), TxtSearch.Text), ct);
+            t.Start();
+            t.ContinueWith(task => { Application.Current.Dispatcher.BeginInvoke((Action)(() => {
+
+                //Checks for exceptions
+                if (task.Exception != null)
+                {
+                    MessageBox.Show("Error:" + Environment.NewLine + task.Exception.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                else if (task.Result != null)
+                {
+                    tree.FocusNode(task.Result);
+                    tree.SelectedItem = task.Result;
+                }
+                else
+                {
+                    MessageBox.Show("No members found.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+
+                //Hides the progress and unlocks the textbox
+                SearchWaitProgress.IsIndeterminate = false;
+                SearchWaitProgress.Visibility = Visibility.Collapsed;
+                TxtSearch.IsEnabled = true;
+
+            })); });
+        }
+
+        //Taken from ICSharpCode.NRefactory.Utils.TreeTraversal
+        /// <summary>
+        /// Converts a tree data structure into a flat list by traversing it in pre-order.
+        /// </summary>
+        /// <param name="input">The root elements of the forest.</param>
+        /// <param name="recursion">The function that gets the children of an element.</param>
+        /// <returns>Iterator that enumerates the tree structure in pre-order.</returns>
+        private static IEnumerable<T> PreOrder<T>(IEnumerable<T> input, Func<T, IEnumerable<T>> recursion)
+        {
+            Stack<IEnumerator<T>> stack = new Stack<IEnumerator<T>>();
+            try
+            {
+                stack.Push(input.GetEnumerator());
+                while (stack.Count > 0)
+                {
+                    while (stack.Peek().MoveNext())
+                    {
+                        T element = stack.Peek().Current;
+                        yield return element;
+                        IEnumerable<T> children = recursion(element);
+                        if (children != null)
+                        {
+                            stack.Push(children.GetEnumerator());
+                        }
+                    }
+                    stack.Pop().Dispose();
+                }
+            }
+            finally
+            {
+                while (stack.Count > 0)
+                {
+                    stack.Pop().Dispose();
+                }
+            }
+        }
+
         private void BtnOk_Click(object sender, RoutedEventArgs e)
         {
             //Member
@@ -178,6 +286,13 @@ namespace ILEdit
             //Returns to the caller
             this.DialogResult = true;
             this.Close();
+        }
+
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        {
+            //Ensures that the search task is ended
+            if (cts != null && !cts.IsCancellationRequested)
+                cts.Cancel();
         }
 
         /// <summary>
