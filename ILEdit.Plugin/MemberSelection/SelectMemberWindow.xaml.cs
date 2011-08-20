@@ -41,13 +41,14 @@ namespace ILEdit
         private XElement _recentMembersNode;
         private ModuleDefinition _destinationModule;
 
-        private const int MAX_RECENT_MEMBERS_COUNT = 5;
+        private int maxRecentMembersCount;
 
         public SelectMemberWindow(Predicate<IMetadataTokenProvider> filter, TokenType token, ModuleDefinition destinationModule)
         {
             //Initializes the components
             InitializeComponent();
             _destinationModule = destinationModule;
+            maxRecentMembersCount = int.Parse(GlobalContainer.InjectionSettings.Attribute("MaxRecentMembersCount").Value);
 
             //Sets the filter
             tree.MemberFilter = filter;
@@ -118,7 +119,7 @@ namespace ILEdit
             var ret = new List<MemberReference>();
 
             //Gets the settings node
-            _recentMembersNode = GlobalContainer.Settings["InjectionRecentMembers"];
+            _recentMembersNode = GlobalContainer.InjectionSettings.Element("RecentMembers");
 
             //Array containing the loaded assemblies
             var asms =
@@ -128,11 +129,11 @@ namespace ILEdit
                 .ToArray();
 
             //Reiterates along the children and builds the references
-            foreach (var xel in _recentMembersNode.Elements(XName.Get("Member")))
+            foreach (var xel in _recentMembersNode.Elements("Member"))
             {
-                var asm = asms.FirstOrDefault(x => x.FullName == xel.Attribute(XName.Get("Assembly")).Value);
-                var module = asm == null ? null : asm.Modules.FirstOrDefault(x => x.Name == xel.Attribute(XName.Get("Module")).Value);
-                var member = module == null ? null : ICSharpCode.ILSpy.XmlDoc.XmlDocKeyProvider.FindMemberByKey(module, xel.Attribute(XName.Get("Key")).Value);
+                var asm = asms.FirstOrDefault(x => x.FullName == xel.Attribute("Assembly").Value);
+                var module = asm == null ? null : asm.Modules.FirstOrDefault(x => x.Name == xel.Attribute("Module").Value);
+                var member = module == null ? null : ICSharpCode.ILSpy.XmlDoc.XmlDocKeyProvider.FindMemberByKey(module, xel.Attribute("Key").Value);
                 if (member == null)
                 {
                     xel.Remove();
@@ -154,25 +155,25 @@ namespace ILEdit
             var key = ICSharpCode.ILSpy.XmlDoc.XmlDocKeyProvider.GetKey(member);
             
             //Removes it (if present) fro the recent list
-            var recentNode = _recentMembersNode.Elements().FirstOrDefault(x => x.Attribute(XName.Get("Key")).Value == key);
+            var recentNode = _recentMembersNode.Elements().FirstOrDefault(x => x.Attribute("Key").Value == key);
             if (recentNode != null)
                 recentNode.Remove();
 
             //Creates a new node and adds it to the list
             recentNode = 
-                new XElement(XName.Get("Member"), 
-                    new XAttribute(XName.Get("Assembly"), member.Module.Assembly.FullName),
-                    new XAttribute(XName.Get("Module"), member.Module.Name),
-                    new XAttribute(XName.Get("Key"), key)
+                new XElement("Member", 
+                    new XAttribute("Assembly", member.Module.Assembly.FullName),
+                    new XAttribute("Module", member.Module.Name),
+                    new XAttribute("Key", key)
                 );
             _recentMembersNode.AddFirst(recentNode);
 
             //Checks if the list has excedeed the maximum allowed size
-            if (_recentMembersNode.Elements().Count() > MAX_RECENT_MEMBERS_COUNT)
+            if (_recentMembersNode.Elements().Count() > maxRecentMembersCount)
                 _recentMembersNode.Elements().Last().Remove();
 
             //Saves the settings
-            GlobalContainer.Settings.Save();
+            GlobalContainer.SettingsManager.Instance.Save();
             
             //Returns to the caller
             this.DialogResult = true;

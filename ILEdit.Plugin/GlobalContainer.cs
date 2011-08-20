@@ -52,14 +52,15 @@ namespace ILEdit
         public class SettingsManager
         {
             ILSpySettings settings;
-            XElement root;
-
+            
             #region Singleton implementation
             
             private SettingsManager()
             {
                 settings = ILSpySettings.Load();
-                root = settings[XName.Get("ILEdit")];
+                Root = settings[XName.Get("ILEdit")];
+                if (Root.Elements().Count() == 0)
+                    RestoreDefault();
             }
 
             private static SettingsManager _instance;
@@ -73,6 +74,11 @@ namespace ILEdit
             #endregion
 
             /// <summary>
+            /// Returns the root settings node &lt;ILEdit /&gt;
+            /// </summary>
+            public XElement Root { get; private set; }
+
+            /// <summary>
             /// Returns the section with the given name
             /// </summary>
             /// <param name="name"></param>
@@ -80,11 +86,11 @@ namespace ILEdit
             public XElement this[string name] { 
                 get 
                 {
-                    var xel = root.Element(XName.Get(name));
+                    var xel = Root.Element(XName.Get(name));
                     if (xel == null)
                     {
                         xel = new XElement(XName.Get(name));
-                        root.Add(xel);
+                        Root.Add(xel);
                     }
                     return xel;
                 } 
@@ -95,16 +101,31 @@ namespace ILEdit
             /// </summary>
             public void Save() 
             {
-                ILSpySettings.SaveSettings(root);
+                ILSpySettings.SaveSettings(Root);
+            }
+
+            /// <summary>
+            /// Restores the settings to their default value
+            /// </summary>
+            public void RestoreDefault()
+            {
+                //Clears the root
+                Root.RemoveAll();
+
+                //Creates <Injection> node
+                Root.Add(new XElement("Injection",
+                    new XAttribute("MaxRecentMembersCount", 5),
+                    new XElement("RecentMembers")
+                ));
             }
 
         }
 
         /// <summary>
-        /// Returns the settings of ILEdit
+        /// Returns the settings of the injection part
         /// </summary>
-        public static SettingsManager Settings {
-            get { return SettingsManager.Instance; } 
+        public static XElement InjectionSettings {
+            get { return SettingsManager.Instance["Injection"]; } 
         }
 
         #endregion
