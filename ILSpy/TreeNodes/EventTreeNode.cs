@@ -46,8 +46,20 @@ namespace ICSharpCode.ILSpy.TreeNodes
 				foreach (var m in ev.OtherMethods)
 					this.Children.Add(new MethodTreeNode(m));
 			}
+
+            this.ForegroundColor = IsPublicAPI ? Colors.Black : Colors.Gray;
+
 		}
-		
+
+        public override bool IsPublicAPI
+        {
+            get
+            {
+                MethodDefinition accessor = ev.AddMethod ?? ev.RemoveMethod;
+                return accessor != null && (accessor.IsPublic || accessor.IsFamilyOrAssembly || accessor.IsFamily);
+            }
+        }
+
 		public EventDefinition EventDefinition
 		{
 			get { return ev; }
@@ -57,30 +69,6 @@ namespace ICSharpCode.ILSpy.TreeNodes
 		{
 			get { return GetText(ev, this.Language); }
 		}
-
-        private Color? _foregroundColor = null;
-        public override Color ForegroundColor
-        {
-            get
-            {
-                if (_foregroundColor.HasValue)
-                    return _foregroundColor.Value;
-                if (ev != null && ev.AddMethod != null)
-                {
-                    var m = ev.AddMethod;
-                    return (m.IsPublic || m.IsVirtual || m.IsFamily) ? Colors.Black : Colors.Gray;
-                }
-                return Colors.Black;
-            }
-            set
-            {
-                if (_foregroundColor.GetValueOrDefault(Colors.Black) != value)
-                {
-                    _foregroundColor = value;
-                    base.ForegroundColor = _foregroundColor.GetValueOrDefault(Colors.Black);
-                }
-            }
-        }
 
 		public static object GetText(EventDefinition eventDef, Language language)
 		{

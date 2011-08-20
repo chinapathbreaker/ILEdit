@@ -40,29 +40,18 @@ namespace ICSharpCode.ILSpy.TreeNodes
 			if (field == null)
 				throw new ArgumentNullException("field");
 			this.field = field;
+            this.ForegroundColor = IsPublicAPI ? Colors.Black : Colors.Gray;
 		}
+
+        public override bool IsPublicAPI
+        {
+            get { return field.IsPublic || field.IsFamily || field.IsFamilyOrAssembly; }
+        }
 
 		public override object Text
 		{
 			get { return HighlightSearchMatch(field.Name, " : " + this.Language.TypeToString(field.FieldType, false, field)); }
 		}
-
-        private Color? _foregroundColor = null;
-        public override Color ForegroundColor
-        {
-            get
-            {
-                return _foregroundColor ?? ((field.IsPublic || field.IsFamily) ? Colors.Black : Colors.Gray);
-            }
-            set
-            {
-                if (_foregroundColor.GetValueOrDefault(Colors.Black) != value)
-                {
-                    _foregroundColor = value;
-                    base.ForegroundColor = _foregroundColor.GetValueOrDefault(Colors.Black);
-                }
-            }
-        }
 
 		public override object Icon
 		{

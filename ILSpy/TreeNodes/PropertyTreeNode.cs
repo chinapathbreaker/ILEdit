@@ -20,6 +20,7 @@ using System;
 using System.Windows.Media;
 using ICSharpCode.Decompiler;
 using Mono.Cecil;
+using System.Linq;
 
 namespace ICSharpCode.ILSpy.TreeNodes
 {
@@ -48,8 +49,24 @@ namespace ICSharpCode.ILSpy.TreeNodes
 				foreach (var m in property.OtherMethods)
 					this.Children.Add(new MethodTreeNode(m));
 			}
-			
+
+            this.ForegroundColor = IsPublicAPI ? Colors.Black : Colors.Gray;
+
 		}
+
+        public override bool IsPublicAPI {
+            get {
+                switch (GetAttributesOfMostAccessibleMethod(property) & MethodAttributes.MemberAccessMask)
+                {
+                    case MethodAttributes.Public:
+                    case MethodAttributes.Family:
+                    case MethodAttributes.FamORAssem:
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        }
 
 		public PropertyDefinition PropertyDefinition {
 			get { return property; }
@@ -135,30 +152,6 @@ namespace ICSharpCode.ILSpy.TreeNodes
 
 			return result;
 		}
-
-        private Color? _foregroundColor = null;
-        public override Color ForegroundColor
-        {
-            get
-            {
-                if (_foregroundColor.HasValue)
-                    return _foregroundColor.Value;
-                if (!_foregroundColor.HasValue && this.property != null && this.property.GetMethod != null)
-                {
-                    var m = this.property.GetMethod;
-                    return (m.IsPublic || m.IsVirtual || m.IsFamily) ? Colors.Black : Colors.Gray;
-                }
-                return Colors.Black;
-            }
-            set
-            {
-                if (_foregroundColor.GetValueOrDefault(Colors.Black) != value)
-                {
-                    _foregroundColor = value;
-                    base.ForegroundColor = _foregroundColor.GetValueOrDefault(Colors.Black);
-                }
-            }
-        }
 
 		public override FilterResult Filter(FilterSettings settings)
 		{

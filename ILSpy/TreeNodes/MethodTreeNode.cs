@@ -42,7 +42,13 @@ namespace ICSharpCode.ILSpy.TreeNodes
 			if (method == null)
 				throw new ArgumentNullException("method");
 			this.method = method;
+            this.ForegroundColor = IsPublicAPI ? Colors.Black : Colors.Gray;
 		}
+
+        public override bool IsPublicAPI
+        {
+            get { return method.IsPublic || method.IsFamily || method.IsFamilyOrAssembly; }
+        }
 
 		public override object Text
 		{
@@ -51,23 +57,6 @@ namespace ICSharpCode.ILSpy.TreeNodes
 				return GetText(method, Language);
 			}
 		}
-
-        private Color? _foregroundColor = null;
-        public override Color ForegroundColor
-        {
-            get
-            {
-                return _foregroundColor ?? ((method.IsPublic || method.IsVirtual || method.IsFamily) ? Colors.Black : Colors.Gray);
-            }
-            set
-            {
-                if (_foregroundColor.GetValueOrDefault(Colors.Black) != value)
-                {
-                    _foregroundColor = value;
-                    base.ForegroundColor = _foregroundColor.GetValueOrDefault(Colors.Black);
-                }
-            }
-        }
 
 		public static object GetText(MethodDefinition method, Language language)
 		{

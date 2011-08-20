@@ -166,5 +166,10 @@ namespace ICSharpCode.ILSpy.TreeNodes
 					ApplyFilterToChild(node);
 			}
 		}
+
+        public virtual bool IsPublicAPI {
+            get { return true; } 
+        }
+
 	}
 }

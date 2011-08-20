@@ -40,6 +40,7 @@ namespace ICSharpCode.ILSpy.TreeNodes
 			this.type = type;
 			this.parentAssemblyNode = parentAssemblyNode;
 			this.LazyLoading = true;
+            this.ForegroundColor = IsPublicAPI ? Colors.Black : Colors.Gray;
 		}
 		
 		public TypeDefinition TypeDefinition {
@@ -62,7 +63,7 @@ namespace ICSharpCode.ILSpy.TreeNodes
 			get { return HighlightSearchMatch(this.Language.FormatTypeName(type)); }
 		}
 		
-		public bool IsPublicAPI {
+		public override bool IsPublicAPI {
 			get {
 				switch (type.Attributes & TypeAttributes.VisibilityMask) {
 					case TypeAttributes.Public:
@@ -75,23 +76,6 @@ namespace ICSharpCode.ILSpy.TreeNodes
 				}
 			}
 		}
-
-        private Color? _foregroundColor = null;
-        public override Color ForegroundColor
-        {
-            get
-            {
-                return _foregroundColor ?? (IsPublicAPI ? Colors.Black : Colors.Gray);
-            }
-            set
-            {
-                if (_foregroundColor.GetValueOrDefault(Colors.Black) != value)
-                {
-                    _foregroundColor = value;
-                    base.ForegroundColor = _foregroundColor.GetValueOrDefault(Colors.Black);
-                }
-            }
-        }
 		
 		public override FilterResult Filter(FilterSettings settings)
 		{
