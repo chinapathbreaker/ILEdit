@@ -32,6 +32,9 @@ namespace ILEdit.Injection
             var moduleNode = ILEdit.Injection.Injectors.TreeHelper.GetModuleNode(node);
             DestinationModule = moduleNode == null ? null : moduleNode.Module;
 
+            //Finds the enclosing type (if any)
+            EnclosingType = Injection.Injectors.TreeHelper.GetType(node);
+
             //Prepares the commands
             _InjectCommand = new RelayCommand(InjectCommandImpl);
         }
@@ -43,6 +46,11 @@ namespace ILEdit.Injection
         /// Returns the module destination of the injection
         /// </summary>
         public ModuleDefinition DestinationModule { get; private set; }
+
+        /// <summary>
+        /// Returns the type enclosing the current node
+        /// </summary>
+        public TypeDefinition EnclosingType { get; private set; }
 
         /// <summary>
         /// Returns a list of all the injectors available for the given node

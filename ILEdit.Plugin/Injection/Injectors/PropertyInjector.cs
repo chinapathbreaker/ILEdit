@@ -62,10 +62,10 @@ namespace ILEdit.Injection.Injectors
         public void Inject(ICSharpCode.ILSpy.TreeNodes.ILSpyTreeNode node, string name, IMetadataTokenProvider member)
         {
             //Type node
-            var type = ((IMemberTreeNode)node).Member as TypeDefinition;
+            var type = (TypeDefinition)((IMemberTreeNode)node).Member;
 
             //Property type
-            var propertyType = type.Module.Import((TypeDefinition)member);
+            var propertyType = type.Module.Import((TypeReference)member, type);
 
             //Creates the property definition
             var prop = new PropertyDefinition(
@@ -77,8 +77,17 @@ namespace ILEdit.Injection.Injectors
             };
 
             //Creates the backing field
-            var backingField = new FieldDefinition(string.Format("<{0}>k__BackingField", name), FieldAttributes.Private, propertyType) { MetadataToken = new MetadataToken(TokenType.Field, ILEdit.GlobalContainer.GetFreeRID(type.Module)) };
-            type.Fields.Add(backingField);
+            FieldReference backingField = new FieldDefinition(string.Format("<{0}>k__BackingField", name), FieldAttributes.Private, propertyType) { MetadataToken = new MetadataToken(TokenType.Field, ILEdit.GlobalContainer.GetFreeRID(type.Module)) };
+            type.Fields.Add((FieldDefinition)backingField);
+
+            //Checks if the type is generic
+            if (type.HasGenericParameters)
+            {
+                var giType = new GenericInstanceType(type);
+                foreach (var x in type.GenericParameters)
+                    giType.GenericArguments.Add(x);
+                backingField = new FieldReference(backingField.Name, propertyType, giType);
+            }
 
             //Creates the get method
             prop.GetMethod = new MethodDefinition(

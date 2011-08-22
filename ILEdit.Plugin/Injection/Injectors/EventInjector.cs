@@ -61,16 +61,16 @@ namespace ILEdit.Injection.Injectors
         public void Inject(ICSharpCode.ILSpy.TreeNodes.ILSpyTreeNode node, string name, Mono.Cecil.IMetadataTokenProvider member)
         {
             //Type
-            var type = ((IMemberTreeNode)node).Member as TypeDefinition;
+            var type = (TypeDefinition)((IMemberTreeNode)node).Member;
 
             //Event type
-            var eventType = type.Module.Import((TypeDefinition)member);
+            var eventType = type.Module.Import((TypeReference)member, type);
 
             //Creates the event
             var evt = new EventDefinition(name, EventAttributes.None, eventType) { MetadataToken = new MetadataToken(TokenType.Event, GlobalContainer.GetFreeRID(type.Module)) };
 
             //Creates the field
-            var backingField = new FieldDefinition(
+            FieldReference backingField = new FieldDefinition(
                 name,
                 FieldAttributes.Private,
                 eventType
@@ -78,6 +78,16 @@ namespace ILEdit.Injection.Injectors
             {
                 MetadataToken = new MetadataToken(TokenType.Field, GlobalContainer.GetFreeRID(type.Module))
             };
+            type.Fields.Add((FieldDefinition)backingField);
+
+            //Checks if the type is generic
+            if (type.HasGenericParameters)
+            {
+                var giType = new GenericInstanceType(type);
+                foreach (var x in type.GenericParameters)
+                    giType.GenericArguments.Add(x);
+                backingField = new FieldReference(backingField.Name, eventType, giType);
+            }
 
             //Creates the addon method
             evt.AddMethod = new MethodDefinition(
@@ -140,7 +150,6 @@ namespace ILEdit.Injection.Injectors
             removeIL.Emit(OpCodes.Ret);
 
             //Adds the members to the type
-            type.Fields.Add(backingField);
             type.Methods.Add(evt.AddMethod);
             type.Methods.Add(evt.RemoveMethod);
             type.Events.Add(evt);

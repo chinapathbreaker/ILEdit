@@ -61,13 +61,13 @@ namespace ILEdit.Injection.Injectors
         public void Inject(ICSharpCode.ILSpy.TreeNodes.ILSpyTreeNode node, string name, IMetadataTokenProvider member)
         {
             //Type
-            var type = ((IMemberTreeNode)node).Member as TypeDefinition;
+            var type = (TypeDefinition)((IMemberTreeNode)node).Member;
 
             //Creates the field definition
             var field = new FieldDefinition(
                 name,
                 FieldAttributes.Public,
-                type.Module.Import((TypeDefinition)member)
+                type.Module.Import((TypeReference)member, type)
             ) {
                 MetadataToken = new MetadataToken(TokenType.Field, ILEdit.GlobalContainer.GetFreeRID(type.Module))
             };
@@ -76,7 +76,7 @@ namespace ILEdit.Injection.Injectors
             type.Fields.Add(field);
             if (node is TypeTreeNode)
             {
-                node.Children.Add(new ILEditTreeNode(field, false));
+                node.Children.Add(new ILEditTreeNode(field, true));
                 TreeHelper.SortChildren((TypeTreeNode)node);
             }
             else if (node is ILEditTreeNode)

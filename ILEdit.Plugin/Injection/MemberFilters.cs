@@ -6,6 +6,7 @@ using Mono.Cecil;
 
 namespace ILEdit.Injection
 {
+
     /// <summary>
     /// Static class containing the most common member filters
     /// </summary>
@@ -76,6 +77,8 @@ namespace ILEdit.Injection
                         case TokenType.Module:
                         case TokenType.Assembly:
                         case TokenType.TypeDef:
+                        case TokenType.TypeSpec:
+                        case TokenType.GenericParam:
                             return true;
                         default:
                             return false;
@@ -105,6 +108,9 @@ namespace ILEdit.Injection
                         case TokenType.TypeDef:
                             var type = (TypeDefinition)x;
                             return !type.IsValueType && !type.IsInterface && !(type.BaseType != null && type.BaseType.FullName == typeof(MulticastDelegate).FullName);
+                        case TokenType.TypeSpec:
+                            var elType = ((GenericInstanceType)x).ElementType.Resolve();
+                            return !elType.IsValueType && !elType.IsInterface && !(elType.BaseType != null && elType.BaseType.FullName == typeof(MulticastDelegate).FullName);
                         default:
                             return false;
                     }
@@ -132,6 +138,9 @@ namespace ILEdit.Injection
                             return true;
                         case TokenType.TypeDef:
                             return ((TypeDefinition)x).IsValueType && !((TypeDefinition)x).IsEnum;
+                        case TokenType.TypeSpec:
+                            var elType = ((GenericInstanceType)x).ElementType.Resolve();
+                            return elType.IsValueType && !elType.IsEnum;
                         default:
                             return false;
                     }
@@ -187,6 +196,9 @@ namespace ILEdit.Injection
                         case TokenType.TypeDef:
                             var type = (TypeDefinition)x;
                             return type.BaseType != null && type.BaseType.FullName == typeof(MulticastDelegate).FullName;
+                        case TokenType.TypeSpec:
+                            var elType = ((GenericInstanceType)x).ElementType.Resolve();
+                            return elType.BaseType != null && elType.BaseType.FullName == typeof(MulticastDelegate).FullName;
                         default:
                             return false;
                     }
@@ -214,6 +226,9 @@ namespace ILEdit.Injection
                             return true;
                         case TokenType.TypeDef:
                             return ((TypeDefinition)x).IsInterface;
+                        case TokenType.TypeSpec:
+                            var elType = ((GenericInstanceType)x).ElementType.Resolve();
+                            return elType.IsInterface;
                         default:
                             return false;
                     }
@@ -267,6 +282,7 @@ namespace ILEdit.Injection
                         case TokenType.Assembly:
                         case TokenType.TypeDef:
                         case TokenType.Method:
+                        case TokenType.MethodSpec:
                             return true;
                         default:
                             return false;

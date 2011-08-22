@@ -14,6 +14,29 @@ namespace ILEdit.Injection.Injectors
     /// </summary>
     internal static class TreeHelper
     {
+        #region GetTypeNode
+
+        /// <summary>
+        /// Returns the first ancestor of the given node representing a type
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        public static TypeDefinition GetType(SharpTreeNode node)
+        {
+            TypeDefinition type = null;
+            SharpTreeNode currentNode = node;
+            while (type == null && currentNode != null)
+            {
+                var memberNode = currentNode as IMemberTreeNode;
+                if (memberNode != null)
+                    type = memberNode.Member as TypeDefinition;
+                currentNode = currentNode.Parent;
+            }
+            return type;
+        }
+
+        #endregion
+
         #region GetModuleNode
 
         /// <summary>
@@ -144,7 +167,7 @@ namespace ILEdit.Injection.Injectors
             //Groups the childen by type
             var ordered =
                 node.Children
-                .GroupBy(x => x is IMemberTreeNode ? typeOrder.IndexOf(((IMemberTreeNode)x).Member.MetadataToken.TokenType) : -1)
+                .GroupBy(x => x is IMemberTreeNode ? typeOrder.IndexOf(((IMemberTreeNode)x).Member.MetadataToken.TokenType == TokenType.MemberRef ? GetTokenTypeForMemberReference((MemberReference)((IMemberTreeNode)x).Member) : ((IMemberTreeNode)x).Member.MetadataToken.TokenType) : -1)
                 .OrderBy(x => x.Key)
                 .SelectMany(x => x.OrderBy(y => y.Text.ToString()))
                 .ToArray();
@@ -155,6 +178,23 @@ namespace ILEdit.Injection.Injectors
             //Readds the children
             foreach (var x in ordered)
                 node.Children.Add(x);
+        }
+
+        private static TokenType GetTokenTypeForMemberReference(MemberReference memberRef)
+        {
+            if (memberRef.DeclaringType != null && memberRef.DeclaringType is GenericInstanceType)
+            {
+                var giType = (GenericInstanceType)memberRef.DeclaringType;
+                var type = giType.ElementType.Resolve();
+                var memberDef = type.Fields.Cast<IMemberDefinition>()
+                    .Concat(type.Methods)
+                    .Concat(type.Properties)
+                    .Concat(type.Events)
+                    .FirstOrDefault(m => m.Name == memberRef.Name);
+                if (memberDef != null)
+                    return memberDef.MetadataToken.TokenType;
+            }
+            return TokenType.MemberRef;
         }
 
         #endregion

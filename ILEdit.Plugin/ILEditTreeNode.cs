@@ -172,6 +172,9 @@ namespace ILEdit
                     //Type
                     case TokenType.TypeDef:
                         return TypeTreeNode.GetIcon((TypeDefinition)_tokenProvider);
+                    //Type specification (generic instance type)
+                    case TokenType.TypeSpec:
+                        return TypeTreeNode.GetIcon(((TypeSpecification)_tokenProvider).ElementType.Resolve());
                     //Field
                     case TokenType.Field:
                         return FieldTreeNode.GetIcon((FieldDefinition)_tokenProvider);
@@ -184,9 +187,26 @@ namespace ILEdit
                     //Property
                     case TokenType.Property:
                         return PropertyTreeNode.GetIcon((PropertyDefinition)_tokenProvider);
-                    default:
-                        return null;
+                    //Member reference
+                    case TokenType.MemberRef:
+                        var memberRef = (MemberReference)_tokenProvider;
+                        if (memberRef.DeclaringType != null && memberRef.DeclaringType is GenericInstanceType)
+                        {
+                            var giType = (GenericInstanceType)memberRef.DeclaringType;
+                            var type = giType.ElementType.Resolve();
+                            var memberDef = type.Fields.Cast<IMemberDefinition>()
+                                .Concat(type.Methods)
+                                .Concat(type.Properties)
+                                .Concat(type.Events)
+                                .FirstOrDefault(m => m.Name == memberRef.Name);
+                            if (memberDef != null)
+                                return new ILEditTreeNode(memberDef, true).Icon;
+                        }
+                        break;
                 }
+
+                //No icons available
+                return null;
             }
         }
 
@@ -206,6 +226,8 @@ namespace ILEdit
                     return EventTreeNode.GetText((EventDefinition)_tokenProvider, language);
                 else if (_tokenProvider is TypeDefinition)
                     return language.FormatTypeName((TypeDefinition)_tokenProvider);
+                else if (_tokenProvider is GenericInstanceType)
+                    return language.TypeToString((GenericInstanceType)_tokenProvider, false);
                 else if (_tokenProvider is PropertyDefinition)
                     return language.FormatPropertyName((PropertyDefinition)_tokenProvider);
 
@@ -245,6 +267,21 @@ namespace ILEdit
                     break;
                 case TokenType.Property:
                     language.DecompileProperty((PropertyDefinition)_tokenProvider, output, options);
+                    break;
+                case TokenType.MemberRef:
+                    var memberRef = (MemberReference)_tokenProvider;
+                    if (memberRef.DeclaringType != null && memberRef.DeclaringType is GenericInstanceType)
+                    {
+                        var giType = (GenericInstanceType)memberRef.DeclaringType;
+                        var type = giType.ElementType.Resolve();
+                        var memberDef = type.Fields.Cast<IMemberDefinition>()
+                            .Concat(type.Methods)
+                            .Concat(type.Properties)
+                            .Concat(type.Events)
+                            .FirstOrDefault(m => m.Name == memberRef.Name);
+                        if (memberDef != null)
+                            new ILEditTreeNode(memberDef, true).Decompile(language, output, options);
+                    }
                     break;
                 default:
                     language.WriteCommentLine(output, (string)this.Text);

@@ -42,17 +42,19 @@ namespace ILEdit
 
         private XElement _recentMembersNode;
         private ModuleDefinition _destinationModule;
+        private TypeDefinition _enclosingType;
 
         private int maxRecentMembersCount;
 
         private CancellationToken ct;
         private CancellationTokenSource cts;
 
-        public SelectMemberWindow(Predicate<IMetadataTokenProvider> filter, TokenType token, ModuleDefinition destinationModule)
+        public SelectMemberWindow(Predicate<IMetadataTokenProvider> filter, TokenType token, ModuleDefinition destinationModule, TypeDefinition enclosingType)
         {
             //Initializes the components
             InitializeComponent();
             _destinationModule = destinationModule;
+            _enclosingType = enclosingType;
             maxRecentMembersCount = int.Parse(GlobalContainer.InjectionSettings.Attribute("MaxRecentMembersCount").Value);
 
             //Sets the filter
@@ -87,7 +89,10 @@ namespace ILEdit
             var recentTypes = GetRecentMembers();
             if (recentTypes.Length > 0)
             {
-                LstRecentTypes.ItemsSource = recentTypes.Select(x => new ILEditTreeNode(x, true));
+                LstRecentTypes.ItemsSource = 
+                    recentTypes
+                    .Where(x => filter(x) && x.MetadataToken.TokenType == token)
+                    .Select(x => new ILEditTreeNode(x, true));
                 LstRecentTypes.SelectionChanged += (_, e) =>
                 {
                     if (e.AddedItems.Count == 1)
@@ -259,17 +264,32 @@ namespace ILEdit
             //Member
             var member = (MemberReference)this.SelectedMember;
 
+            //Checks if the selected member has some generic parameters
+            var generic = member as IGenericParameterProvider;
+            if (generic != null && generic.HasGenericParameters)
+            {
+                var genericWindow = new GenericResolutionWindow(generic, _enclosingType);
+                if (genericWindow.ShowDialog().GetValueOrDefault(false))
+                {
+                    this.SelectedMember = (MemberReference)genericWindow.ResolvedGeneric;
+                }
+                else
+                {
+                    return;
+                }
+            }
+
             //Computes the key for the selected member
             var key = ICSharpCode.ILSpy.XmlDoc.XmlDocKeyProvider.GetKey(member);
-            
+
             //Removes it (if present) fro the recent list
             var recentNode = _recentMembersNode.Elements().FirstOrDefault(x => x.Attribute("Key").Value == key);
             if (recentNode != null)
                 recentNode.Remove();
 
             //Creates a new node and adds it to the list
-            recentNode = 
-                new XElement("Member", 
+            recentNode =
+                new XElement("Member",
                     new XAttribute("Assembly", member.Module.Assembly.FullName),
                     new XAttribute("Module", member.Module.Name),
                     new XAttribute("Key", key)
@@ -282,7 +302,7 @@ namespace ILEdit
 
             //Saves the settings
             GlobalContainer.SettingsManager.Instance.Save();
-            
+
             //Returns to the caller
             this.DialogResult = true;
             this.Close();

@@ -72,6 +72,9 @@
     </Compile>
     <Compile Include="Injection\InjectWindow\InjectWindowViewModel.cs" />
     <Compile Include="Injection\MemberFilters.cs" />
+    <Compile Include="MemberSelection\GenericResolutionWindow.xaml.cs">
+      <DependentUpon>GenericResolutionWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MemberSelection\SelectMemberBox.xaml.cs">
       <DependentUpon>SelectMemberBox.xaml</DependentUpon>
     </Compile>
@@ -117,6 +120,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="MemberSelection\GenericResolutionWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MemberSelection\SelectMemberBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -143,7 +150,9 @@
   <ItemGroup>
     <Resource Include="Images\Rename.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Images\GenericType.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
