@@ -93,7 +93,17 @@ namespace ILEdit
 
         // Using a DependencyProperty as the backing store for MemberFilter.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty MemberFilterProperty =
-            DependencyProperty.Register("MemberFilter", typeof(Predicate<IMetadataTokenProvider>), typeof(SelectMemberBox), new PropertyMetadata(null));
+            DependencyProperty.Register("MemberFilter", typeof(Predicate<IMetadataTokenProvider>), typeof(SelectMemberBox), new PropertyMetadata(null, OnMemberFilterChanged));
+
+        private static void OnMemberFilterChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            //Sender
+            var s = (SelectMemberBox)sender;
+
+            //If the new value isn't null updates the generic combo
+            if (e.NewValue != null && s.EnclosingType != null && s.EnclosingType.HasGenericParameters)
+                s.GenericsCombo.ItemsSource = s.GetComboBoxItems(GetGenericParameters(s.EnclosingType));
+        }
 
 
         #endregion
@@ -156,7 +166,7 @@ namespace ILEdit
 
             //Fills the generic combo
             if (generics)
-                s.GenericsCombo.ItemsSource = GetComboBoxItems(GetGenericParameters(type));
+                s.GenericsCombo.ItemsSource = s.GetComboBoxItems(GetGenericParameters(type));
         }
 
         private void GenericsCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -177,7 +187,7 @@ namespace ILEdit
             else
             {
                 //Shows the window to select the type
-                var win = new SelectMemberWindow(Injection.MemberFilters.Types, TokenType.TypeDef, DestinationModule, EnclosingType);
+                var win = new SelectMemberWindow(MemberFilter, TokenType.TypeDef, DestinationModule, EnclosingType);
                 if (win.ShowDialog().GetValueOrDefault(false))
                 {
                     //Creates the combo box item
@@ -218,13 +228,18 @@ namespace ILEdit
             return lst;
         }
 
-        private static ObservableCollection<ComboBoxItem> GetComboBoxItems(IEnumerable<GenericParameter> parameters)
+        private ObservableCollection<ComboBoxItem> GetComboBoxItems(IEnumerable<GenericParameter> parameters)
         {
             //List
             var lst = new List<ComboBoxItem>();
 
+            //Filters the parameters
+            IEnumerable<GenericParameter> filteredParameters = parameters;
+            if (MemberFilter != null)
+                filteredParameters = parameters.Where(p => MemberFilter(p));
+
             //Creates the combo box items from the parameters
-            foreach (var p in parameters)
+            foreach (var p in filteredParameters)
                 lst.Add(new ComboBoxItem() { Content = GetContentForComboBoxItem(p), Tag = p });
 
             //Creates the select type item
