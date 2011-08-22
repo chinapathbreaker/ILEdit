@@ -42,7 +42,7 @@ namespace ICSharpCode.ILSpy.TreeNodes
 			if (method == null)
 				throw new ArgumentNullException("method");
 			this.method = method;
-            this.ForegroundColor = IsPublicAPI ? Colors.Black : Colors.Gray;
+            this.Foreground = new SolidColorBrush(IsPublicAPI ? Colors.Black : Colors.Gray);
 		}
 
         public override bool IsPublicAPI
@@ -142,7 +142,7 @@ namespace ICSharpCode.ILSpy.TreeNodes
 			else
 				return FilterResult.Hidden;
 		}
-
+		
 		MemberReference IMemberTreeNode.Member
 		{
 			get { return method; }

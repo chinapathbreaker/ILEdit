@@ -21,7 +21,7 @@ namespace ILEdit
         static GlobalContainer()
         {
             //Sets the color
-            ModifiedNodesColor = Colors.Red;
+            ModifiedNodesBrush = new SolidColorBrush(Colors.Red);
 
             //Adds the injectors
             Injectors = new List<IInjector>() { 
@@ -139,12 +139,12 @@ namespace ILEdit
 
         #endregion
 
-        #region ModifiedNodesColor
+        #region ModifiedNodesBrush
 
         /// <summary>
         /// Returns the color used to identify the edited nodes
         /// </summary>
-        public static Color ModifiedNodesColor { get; private set; }
+        public static Brush ModifiedNodesBrush { get; private set; }
 
         #endregion
 

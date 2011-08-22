@@ -56,7 +56,7 @@ namespace ICSharpCode.TreeView
             //Updates the Foreground property
             var node = this.Node;
             if (node != null)
-                this.SetBinding(SharpTreeViewItem.ForegroundProperty, new System.Windows.Data.Binding() { Source = this.Node, Path = new PropertyPath("ForegroundColor"), Converter = new ColorToBrushConverter() });
+                this.SetBinding(SharpTreeViewItem.ForegroundProperty, new System.Windows.Data.Binding() { Source = this.Node, Path = new PropertyPath("Foreground") });
             else
                 this.Foreground = new SolidColorBrush(Colors.Black);
         }

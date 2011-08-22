@@ -62,7 +62,7 @@ namespace ILEdit.Injection.Injectors
             moduleNode.Module.AssemblyReferences.Add(AssemblyNameReference.Parse(name));
 
             //Adds the node
-            node.Children.Add(new AssemblyReferenceTreeNode(AssemblyNameReference.Parse(name), TreeHelper.GetAssemblyNode(moduleNode)) { ForegroundColor = GlobalContainer.ModifiedNodesColor });
+            node.Children.Add(new AssemblyReferenceTreeNode(AssemblyNameReference.Parse(name), TreeHelper.GetAssemblyNode(moduleNode)) { Foreground = GlobalContainer.ModifiedNodesBrush });
             TreeHelper.SortChildren((ReferenceFolderTreeNode)node);
         }
     }

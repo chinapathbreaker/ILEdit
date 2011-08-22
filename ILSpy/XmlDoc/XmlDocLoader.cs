@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2011 AlphaSierraPapa for the SharpDevelop Team
+// Copyright (c) 2011 AlphaSierraPapa for the SharpDevelop Team
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this
 // software and associated documentation files (the "Software"), to deal in the Software
@@ -99,8 +99,8 @@ namespace ICSharpCode.ILSpy.XmlDoc
 		
 		static string LookupLocalizedXmlDoc(string fileName)
 		{
-            if (string.IsNullOrEmpty(fileName))
-                return null;
+			if (string.IsNullOrEmpty(fileName))
+				return null;
 			string xmlFileName = Path.ChangeExtension(fileName, ".xml");
 			string currentCulture = System.Threading.Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName;
 			string localizedXmlDocFile = GetLocalizedName(xmlFileName, currentCulture);

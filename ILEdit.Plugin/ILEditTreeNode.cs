@@ -34,7 +34,7 @@ namespace ILEdit
             _manuallyFilledChildren = manuallyFilledChildren;
 
             //Sets the foreground
-            this.ForegroundColor = GlobalContainer.ModifiedNodesColor;
+            this.Foreground = GlobalContainer.ModifiedNodesBrush;
         }
 
         /// <summary>
@@ -134,7 +134,7 @@ namespace ILEdit
 
             //Adds the children
             foreach (var x in children)
-                this.Children.Add(new ILEditTreeNode(x, false) { ChildrenFilter = this.ChildrenFilter, ForegroundColor = this.ForegroundColor });
+                this.Children.Add(new ILEditTreeNode(x, false) { ChildrenFilter = this.ChildrenFilter, Foreground = this.Foreground });
         }
 
         /// <summary>

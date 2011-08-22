@@ -66,7 +66,7 @@ namespace ICSharpCode.ILSpy.TreeNodes
 				return FilterResult.Recurse;
 		}
 
-		public bool IsPublicAPI
+		public override bool IsPublicAPI
 		{
 			get
 			{

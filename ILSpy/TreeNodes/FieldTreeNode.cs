@@ -40,7 +40,7 @@ namespace ICSharpCode.ILSpy.TreeNodes
 			if (field == null)
 				throw new ArgumentNullException("field");
 			this.field = field;
-            this.ForegroundColor = IsPublicAPI ? Colors.Black : Colors.Gray;
+            this.Foreground = new SolidColorBrush(IsPublicAPI ? Colors.Black : Colors.Gray);
 		}
 
         public override bool IsPublicAPI
