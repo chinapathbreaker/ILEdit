@@ -105,11 +105,15 @@ namespace ILEdit.ContextMenu
                     //Event
                     case TokenType.Event:
                         var evt = (EventDefinition)m;
+                        foreach (var x in new MethodDefinition[] { evt.AddMethod, evt.RemoveMethod, evt.InvokeMethod }.Concat(evt.OtherMethods).Where(x => x != null))
+                            evt.DeclaringType.Methods.Remove(x);
                         evt.DeclaringType.Events.Remove(evt);
                         break;
                     //Property
                     case TokenType.Property:
                         var property = (PropertyDefinition)m;
+                        foreach (var x in new MethodDefinition[] { property.GetMethod, property.SetMethod }.Concat(property.OtherMethods).Where(x => x != null))
+                            property.DeclaringType.Methods.Remove(x);
                         property.DeclaringType.Properties.Remove(property);
                         break;
                     //Other

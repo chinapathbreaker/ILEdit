@@ -217,31 +217,38 @@ namespace ILEdit
         {
             get
             {
-                //Checks if the member is a member with particular text formatting
-                if (_tokenProvider is MethodDefinition)
-                    return MethodTreeNode.GetText((MethodDefinition)_tokenProvider, language);
-                else if (_tokenProvider is PropertyDefinition)
-                    return PropertyTreeNode.GetText((PropertyDefinition)_tokenProvider, language);
-                else if (_tokenProvider is EventDefinition)
-                    return EventTreeNode.GetText((EventDefinition)_tokenProvider, language);
-                else if (_tokenProvider is TypeDefinition)
-                    return language.FormatTypeName((TypeDefinition)_tokenProvider);
-                else if (_tokenProvider is GenericInstanceType)
-                    return language.TypeToString((GenericInstanceType)_tokenProvider, false);
-                else if (_tokenProvider is PropertyDefinition)
-                    return language.FormatPropertyName((PropertyDefinition)_tokenProvider);
+                try
+                {
+                    //Checks if the member is a member with particular text formatting
+                    if (_tokenProvider is MethodDefinition)
+                        return MethodTreeNode.GetText((MethodDefinition)_tokenProvider, language);
+                    else if (_tokenProvider is PropertyDefinition)
+                        return PropertyTreeNode.GetText((PropertyDefinition)_tokenProvider, language);
+                    else if (_tokenProvider is EventDefinition)
+                        return EventTreeNode.GetText((EventDefinition)_tokenProvider, language);
+                    else if (_tokenProvider is TypeDefinition)
+                        return language.FormatTypeName((TypeDefinition)_tokenProvider);
+                    else if (_tokenProvider is GenericInstanceType)
+                        return language.TypeToString((GenericInstanceType)_tokenProvider, false);
+                    else if (_tokenProvider is PropertyDefinition)
+                        return language.FormatPropertyName((PropertyDefinition)_tokenProvider);
 
-                //Returns the normal name
-                else if (_tokenProvider is AssemblyDefinition)
-                    return ((AssemblyDefinition)_tokenProvider).Name.Name;
-                else if (_tokenProvider is ModuleDefinition)
-                    return ((ModuleDefinition)_tokenProvider).Name;
-                else if (_tokenProvider is IMemberDefinition)
-                    return ((IMemberDefinition)_tokenProvider).Name;
-                else if (_tokenProvider is MemberReference)
-                    return ((MemberReference)_tokenProvider).Name;
-                else
-                    throw new NotSupportedException();
+                    //Returns the normal name
+                    else if (_tokenProvider is AssemblyDefinition)
+                        return ((AssemblyDefinition)_tokenProvider).Name.Name;
+                    else if (_tokenProvider is ModuleDefinition)
+                        return ((ModuleDefinition)_tokenProvider).Name;
+                    else if (_tokenProvider is IMemberDefinition)
+                        return ((IMemberDefinition)_tokenProvider).Name;
+                    else if (_tokenProvider is MemberReference)
+                        return ((MemberReference)_tokenProvider).Name;
+                    else
+                        throw new NotSupportedException();
+                }
+                catch (Exception)
+                {
+                    return string.Empty;
+                }
             }
         }
 
