@@ -159,8 +159,10 @@
 							<TextBlock TextWrapping="Wrap" VerticalAlignment="Center" Margin="5,0,0,0"><Run Language="it-it" Text="Inject existing"/></TextBlock>
 						</StackPanel>
 					</TabItem.Header>
-					<Grid Background="#FFE5E5E5"/>
-				</TabItem>
+                    <Grid>
+                        <local:SelectMemberControl BorderBrush="Transparent" BorderThickness="0" SelectableMembers="{Binding ExistingSelectableMembers}" MemberFilter="{Binding ExistingMemberFilter}" SelectedMember="{Binding ExistingSelectedMember, Mode=OneWayToSource}" />
+                    </Grid>
+                </TabItem>
 			</TabControl>
 		</Border>
 		<TextBlock TextWrapping="Wrap" d:LayoutOverrides="Width, Height" Grid.Row="2" VerticalAlignment="Center" Margin="5,0,15,0"><Run Language="it-it" Text="Name:"/></TextBlock>

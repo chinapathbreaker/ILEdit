@@ -111,15 +111,15 @@ namespace ILEdit
         #region SelectableMembers property
 
 
-        public TokenType SelectableMembers
+        public List<TokenType> SelectableMembers
         {
-            get { return (TokenType)GetValue(SelectableMembersProperty); }
+            get { return (List<TokenType>)GetValue(SelectableMembersProperty); }
             set { SetValue(SelectableMembersProperty, value); }
         }
 
         // Using a DependencyProperty as the backing store for SelectableMembers.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty SelectableMembersProperty =
-            DependencyProperty.Register("SelectableMembers", typeof(TokenType), typeof(SelectMemberBox), new UIPropertyMetadata(TokenType.TypeDef));
+            DependencyProperty.Register("SelectableMembers", typeof(List<TokenType>), typeof(SelectMemberBox), new PropertyMetadata(new[] { TokenType.TypeDef }.ToList()));
 
 
         #endregion
@@ -187,7 +187,7 @@ namespace ILEdit
             else
             {
                 //Shows the window to select the type
-                var win = new SelectMemberWindow(MemberFilter, TokenType.TypeDef, DestinationModule, EnclosingType);
+                var win = new SelectMemberWindow(MemberFilter, new[] { TokenType.TypeDef }, DestinationModule, EnclosingType);
                 if (win.ShowDialog().GetValueOrDefault(false))
                 {
                     //Creates the combo box item

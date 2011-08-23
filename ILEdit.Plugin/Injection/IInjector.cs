@@ -40,9 +40,9 @@ namespace ILEdit.Injection
         Predicate<IMetadataTokenProvider> MemberFilter { get; }
 
         /// <summary>
-        /// Returns a TokenType representing the members that the user can choose (if NeedsType is true)
+        /// Returns a TokenType[] representing the members that the user can choose (if NeedsType is true)
         /// </summary>
-        TokenType SelectableMembers { get; }
+        TokenType[] SelectableMembers { get; }
 
         /// <summary>
         /// Determines if this injector can inject in the given node

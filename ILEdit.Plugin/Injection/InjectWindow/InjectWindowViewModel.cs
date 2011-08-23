@@ -15,11 +15,12 @@ namespace ILEdit.Injection
         #region .ctor
         ILSpyTreeNode _node;
         Window _window;
-        public InjectWindowViewModel(ILSpyTreeNode node, Window window)
+        public InjectWindowViewModel(ILSpyTreeNode node, Window window, bool canInjectExisting)
         {
             //Stores the given parameters
             _node = node;
             _window = window;
+            InjectExistingEnabled = canInjectExisting;
 
             //Loads the injectors
             Injectors = GlobalContainer.Injectors.Where(x => x.CanInjectInNode(node)).ToArray();
@@ -34,6 +35,13 @@ namespace ILEdit.Injection
 
             //Finds the enclosing type (if any)
             EnclosingType = Injection.Injectors.TreeHelper.GetType(node);
+
+            //Prepares the filters for the inject existing part
+            if (canInjectExisting)
+            {
+                ExistingMemberFilter = node is ModuleTreeNode ? MemberFilters.Types : null;
+                ExistingSelectableMembers = node is ModuleTreeNode ? new[] { TokenType.TypeDef } : new[] { TokenType.TypeDef, TokenType.Field, TokenType.Property, TokenType.Method, TokenType.Event };
+            }
 
             //Prepares the commands
             _InjectCommand = new RelayCommand(InjectCommandImpl);
@@ -90,7 +98,22 @@ namespace ILEdit.Injection
         /// <summary>
         /// Gets or sets a value indicating whether the tab 'Inject existing' is enabled or not
         /// </summary>
-        public bool InjectExistingEnabled { get; set; }
+        public bool InjectExistingEnabled { get; private set; }
+
+        /// <summary>
+        /// Returns a value indicating which members the user can select
+        /// </summary>
+        public TokenType[] ExistingSelectableMembers { get; private set; }
+
+        /// <summary>
+        /// Returns the predicate used to filter the members to show in the inject existing part
+        /// </summary>
+        public Predicate<IMetadataTokenProvider> ExistingMemberFilter { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the member selected in the inject existing part
+        /// </summary>
+        public IMetadataTokenProvider ExistingSelectedMember { get; set; }
 
         #endregion
 

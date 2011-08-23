@@ -41,9 +41,9 @@ namespace ILEdit.Injection.Injectors
             get { return MemberFilters.Delegates; }
         }
 
-        public TokenType SelectableMembers
+        public TokenType[] SelectableMembers
         {
-            get { return TokenType.TypeDef; }
+            get { return new TokenType[] { TokenType.TypeDef }; }
         } 
 
         #endregion

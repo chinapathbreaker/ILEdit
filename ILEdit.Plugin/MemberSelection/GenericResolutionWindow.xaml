@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:ILEdit"
+             xmlns:cecil="clr-namespace:Mono.Cecil;assembly=Mono.Cecil"
              Title="Resolve generics" ShowInTaskbar="False" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Width="400" Height="400">
     <Grid Margin="5">
         <Grid.RowDefinitions>
@@ -36,7 +37,11 @@
                     <GridViewColumn Header="Type" Width="280">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <local:SelectMemberBox Background="Transparent" BorderBrush="Transparent" Cursor="Hand" SelectableMembers="TypeDef" MemberFilter="{Binding MemberFilter}" DestinationModule="{Binding DestinationModule}" EnclosingType="{Binding EnclosingType}" SelectedMember="{Binding SelectedMember, Mode=OneWayToSource}" />
+                                <local:SelectMemberBox Background="Transparent" BorderBrush="Transparent" Cursor="Hand" MemberFilter="{Binding MemberFilter}" DestinationModule="{Binding DestinationModule}" EnclosingType="{Binding EnclosingType}" SelectedMember="{Binding SelectedMember, Mode=OneWayToSource}">
+                                    <local:SelectMemberBox.SelectableMembers>
+                                        <cecil:TokenType>TypeDef</cecil:TokenType>
+                                    </local:SelectMemberBox.SelectableMembers>
+                                </local:SelectMemberBox>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

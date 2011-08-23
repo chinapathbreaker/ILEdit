@@ -49,7 +49,7 @@ namespace ILEdit
         private CancellationToken ct;
         private CancellationTokenSource cts;
 
-        public SelectMemberWindow(Predicate<IMetadataTokenProvider> filter, TokenType token, ModuleDefinition destinationModule, TypeDefinition enclosingType)
+        public SelectMemberWindow(Predicate<IMetadataTokenProvider> filter, IList<TokenType> token, ModuleDefinition destinationModule, TypeDefinition enclosingType)
         {
             //Initializes the components
             InitializeComponent();
@@ -68,7 +68,7 @@ namespace ILEdit
                 LstCommonTypes.ItemsSource =
                     _commonMembers
                     .Select(x => new ILEditTreeNode(new TypeReference(x.Item1, x.Item2, destinationModule, destinationModule.TypeSystem.Corlib).Resolve(), true))
-                    .Where(x => filter(x.TokenProvider) && x.TokenProvider.MetadataToken.TokenType == token);
+                    .Where(x => filter(x.TokenProvider) && token.Any(t => t == x.TokenProvider.MetadataToken.TokenType));
 
                 //Registers the selection handler
                 LstCommonTypes.SelectionChanged += (_, e) => {
@@ -91,7 +91,7 @@ namespace ILEdit
             {
                 LstRecentTypes.ItemsSource = 
                     recentTypes
-                    .Where(x => filter(x) && x.MetadataToken.TokenType == token)
+                    .Where(x => filter(x) && token.Any(t => t == x.MetadataToken.TokenType))
                     .Select(x => new ILEditTreeNode(x, true));
                 LstRecentTypes.SelectionChanged += (_, e) =>
                 {
