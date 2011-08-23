@@ -54,8 +54,8 @@ namespace ILEdit.Injection.Injectors
             var memberNode = node as IMemberTreeNode;
             var type = memberNode == null ? null : (memberNode.Member as TypeDefinition);
 
-            //Can inject only in types
-            return type != null;
+            //Can inject only in types (except interfaces)
+            return type != null && !type.IsInterface;
         }
 
         public void Inject(ICSharpCode.ILSpy.TreeNodes.ILSpyTreeNode node, string name, IMetadataTokenProvider member)

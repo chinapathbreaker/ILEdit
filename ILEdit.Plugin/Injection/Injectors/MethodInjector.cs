@@ -74,8 +74,13 @@ namespace ILEdit.Injection.Injectors
                 MetadataToken = new MetadataToken(TokenType.Method, ILEdit.GlobalContainer.GetFreeRID(type.Module))
             };
 
+            //Checks if the destination type is an interface
+            if (type.IsInterface)
+                method.Attributes |= MethodAttributes.NewSlot | MethodAttributes.CheckAccessOnOverride | MethodAttributes.Abstract | MethodAttributes.Virtual;
+
             //Adds the method to the type
             type.Methods.Add(method);
+            method.Overrides.Clear();
             if (node is TypeTreeNode)
             {
                 node.Children.Add(new ILEditTreeNode(method, false));

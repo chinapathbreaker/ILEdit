@@ -76,9 +76,13 @@ namespace ILEdit.Injection.Injectors
                 MetadataToken = new MetadataToken(TokenType.Property, ILEdit.GlobalContainer.GetFreeRID(type.Module))
             };
 
-            //Creates the backing field
-            FieldReference backingField = new FieldDefinition(string.Format("<{0}>k__BackingField", name), FieldAttributes.Private, propertyType) { MetadataToken = new MetadataToken(TokenType.Field, ILEdit.GlobalContainer.GetFreeRID(type.Module)) };
-            type.Fields.Add((FieldDefinition)backingField);
+            //Creates the backing field if we aren't injecting in an interface
+            FieldReference backingField = null;
+            if (!type.IsInterface)
+            {
+                backingField = new FieldDefinition(string.Format("<{0}>k__BackingField", name), FieldAttributes.Private, propertyType) { MetadataToken = new MetadataToken(TokenType.Field, ILEdit.GlobalContainer.GetFreeRID(type.Module)) };
+                type.Fields.Add((FieldDefinition)backingField);
+            }
 
             //Checks if the type is generic
             if (type.HasGenericParameters)
@@ -92,26 +96,32 @@ namespace ILEdit.Injection.Injectors
             //Creates the get method
             prop.GetMethod = new MethodDefinition(
                 "get_" + name,
-                MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName,
+                MethodAttributes.Public  | MethodAttributes.SpecialName,
                 propertyType
             ) { 
                 IsGetter = true,
                 MetadataToken = new MetadataToken(TokenType.Method, ILEdit.GlobalContainer.GetFreeRID(type.Module))
             };
 
-            //Writes the instructions in the get method
-            var getBody = prop.GetMethod.Body;
-            getBody.MaxStackSize = 1;
-            getBody.GetType().GetField("code_size", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).SetValue(getBody, 1); //ILSpy doesn't decompile the method otherwise!
-            var getProcessor = getBody.GetILProcessor();
-            getProcessor.Emit(OpCodes.Ldarg_0);
-            getProcessor.Emit(OpCodes.Ldfld, backingField);
-            getProcessor.Emit(OpCodes.Ret);
+            //Checks if the destination type is an interface
+            if (type.IsInterface)
+                prop.GetMethod.Attributes |= MethodAttributes.NewSlot | MethodAttributes.CheckAccessOnOverride | MethodAttributes.Abstract | MethodAttributes.Virtual;
+            else
+            {
+                //Writes the instructions in the get method
+                var getBody = prop.GetMethod.Body;
+                getBody.MaxStackSize = 1;
+                getBody.GetType().GetField("code_size", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).SetValue(getBody, 1); //ILSpy doesn't decompile the method otherwise!
+                var getProcessor = getBody.GetILProcessor();
+                getProcessor.Emit(OpCodes.Ldarg_0);
+                getProcessor.Emit(OpCodes.Ldfld, backingField);
+                getProcessor.Emit(OpCodes.Ret);
+            }
 
             //Creates the set method
             prop.SetMethod = new MethodDefinition(
                 "set_" + name,
-                MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName,
+                MethodAttributes.Public | MethodAttributes.SpecialName,
                 type.Module.TypeSystem.Void
             )
             {
@@ -122,25 +132,34 @@ namespace ILEdit.Injection.Injectors
                 }
             };
 
-            //Writes the instructions in the set method
-            var setBody = prop.SetMethod.Body;
-            setBody.MaxStackSize = 8;
-            setBody.GetType().GetField("code_size", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).SetValue(setBody, 1);
-            var setProcessor = setBody.GetILProcessor();
-            setProcessor.Emit(OpCodes.Ldarg_0);
-            setProcessor.Emit(OpCodes.Ldarg_1);
-            setProcessor.Emit(OpCodes.Stfld, backingField);
-            setProcessor.Emit(OpCodes.Ret);
+            //Checks if the destination type is an interface
+            if (type.IsInterface)
+                prop.SetMethod.Attributes |= MethodAttributes.NewSlot | MethodAttributes.CheckAccessOnOverride | MethodAttributes.Abstract | MethodAttributes.Virtual;
+            else
+            {
+                //Writes the instructions in the set method
+                var setBody = prop.SetMethod.Body;
+                setBody.MaxStackSize = 8;
+                setBody.GetType().GetField("code_size", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).SetValue(setBody, 1);
+                var setProcessor = setBody.GetILProcessor();
+                setProcessor.Emit(OpCodes.Ldarg_0);
+                setProcessor.Emit(OpCodes.Ldarg_1);
+                setProcessor.Emit(OpCodes.Stfld, backingField);
+                setProcessor.Emit(OpCodes.Ret);
+            }
 
             //Adds the property to the type
             type.Properties.Add(prop);
             type.Methods.Add(prop.GetMethod);
             type.Methods.Add(prop.SetMethod);
-            
+            prop.GetMethod.Overrides.Clear(); //Overrides automatically added?!
+            prop.SetMethod.Overrides.Clear();
+
             //Creates the nodes
             if (node is TypeTreeNode)
             {
-                node.Children.Add(new ILEditTreeNode(backingField, true));
+                if (!type.IsInterface)
+                    node.Children.Add(new ILEditTreeNode(backingField, true));
                 node.Children.Add(new ILEditTreeNode(prop, false));
                 TreeHelper.SortChildren((TypeTreeNode)node);
             }

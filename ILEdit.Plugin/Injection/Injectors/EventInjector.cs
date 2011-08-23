@@ -70,15 +70,19 @@ namespace ILEdit.Injection.Injectors
             var evt = new EventDefinition(name, EventAttributes.None, eventType) { MetadataToken = new MetadataToken(TokenType.Event, GlobalContainer.GetFreeRID(type.Module)) };
 
             //Creates the field
-            FieldReference backingField = new FieldDefinition(
-                name,
-                FieldAttributes.Private,
-                eventType
-            )
+            FieldReference backingField = null;
+            if (!type.IsInterface)
             {
-                MetadataToken = new MetadataToken(TokenType.Field, GlobalContainer.GetFreeRID(type.Module))
-            };
-            type.Fields.Add((FieldDefinition)backingField);
+                backingField = new FieldDefinition(
+                    name,
+                    FieldAttributes.Private,
+                    eventType
+                )
+                {
+                    MetadataToken = new MetadataToken(TokenType.Field, GlobalContainer.GetFreeRID(type.Module))
+                };
+                type.Fields.Add((FieldDefinition)backingField);
+            }
 
             //Checks if the type is generic
             if (type.HasGenericParameters)
@@ -96,7 +100,7 @@ namespace ILEdit.Injection.Injectors
                 type.Module.TypeSystem.Void
             )
             {
-                IsSynchronized = true,
+                IsSynchronized = !type.IsInterface,
                 IsAddOn = true,
                 MetadataToken = new MetadataToken(TokenType.Method, GlobalContainer.GetFreeRID(type.Module)),
                 Parameters = { 
@@ -104,21 +108,26 @@ namespace ILEdit.Injection.Injectors
                 }
             };
 
-            //Writes the instruction of the addon method
-            var addBody = evt.AddMethod.Body;
-            addBody.MaxStackSize = 8;
-            addBody.GetType().GetField("code_size", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).SetValue(addBody, 1);
-            var addIL = addBody.GetILProcessor();
-            addIL.Emit(OpCodes.Ldarg_0);
-            addIL.Emit(OpCodes.Ldarg_0);
-            addIL.Emit(OpCodes.Ldfld, backingField);
-            addIL.Emit(OpCodes.Ldarg_1);
-            //Delegate.Combine(Delegate, Delegate)
-            addIL.Emit(OpCodes.Call, type.Module.Import(new TypeReference("System", "Delegate", type.Module, type.Module.TypeSystem.Corlib).Resolve().Methods.First(x => x.Name == "Combine" && x.IsStatic && x.Parameters.Count == 2 && x.Parameters.All(p => p.ParameterType.FullName == "System.Delegate"))));
-            addIL.Emit(OpCodes.Castclass, eventType);
-            addIL.Emit(OpCodes.Stfld, backingField);
-            addIL.Emit(OpCodes.Ret);
-
+            //Checks if the destination type is an interface
+            if (type.IsInterface)
+                evt.AddMethod.Attributes |= MethodAttributes.NewSlot | MethodAttributes.CheckAccessOnOverride | MethodAttributes.Abstract | MethodAttributes.Virtual;
+            else
+            {
+                //Writes the instruction of the addon method
+                var addBody = evt.AddMethod.Body;
+                addBody.MaxStackSize = 8;
+                addBody.GetType().GetField("code_size", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).SetValue(addBody, 1);
+                var addIL = addBody.GetILProcessor();
+                addIL.Emit(OpCodes.Ldarg_0);
+                addIL.Emit(OpCodes.Ldarg_0);
+                addIL.Emit(OpCodes.Ldfld, backingField);
+                addIL.Emit(OpCodes.Ldarg_1);
+                //Delegate.Combine(Delegate, Delegate)
+                addIL.Emit(OpCodes.Call, type.Module.Import(new TypeReference("System", "Delegate", type.Module, type.Module.TypeSystem.Corlib).Resolve().Methods.First(x => x.Name == "Combine" && x.IsStatic && x.Parameters.Count == 2 && x.Parameters.All(p => p.ParameterType.FullName == "System.Delegate"))));
+                addIL.Emit(OpCodes.Castclass, eventType);
+                addIL.Emit(OpCodes.Stfld, backingField);
+                addIL.Emit(OpCodes.Ret);
+            }
             //Creates the removeon method
             evt.RemoveMethod = new MethodDefinition(
                 "remove_" + name,
@@ -126,7 +135,7 @@ namespace ILEdit.Injection.Injectors
                 type.Module.TypeSystem.Void
             )
             {
-                IsSynchronized = true,
+                IsSynchronized = !type.IsInterface,
                 IsRemoveOn = true,
                 MetadataToken = new MetadataToken(TokenType.Method, GlobalContainer.GetFreeRID(type.Module)),
                 Parameters = { 
@@ -134,30 +143,39 @@ namespace ILEdit.Injection.Injectors
                 }
             };
 
-            //Writes the instruction of the removeon method
-            var removeBody = evt.RemoveMethod.Body;
-            removeBody.MaxStackSize = 8;
-            removeBody.GetType().GetField("code_size", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).SetValue(removeBody, 1);
-            var removeIL = removeBody.GetILProcessor();
-            removeIL.Emit(OpCodes.Ldarg_0);
-            removeIL.Emit(OpCodes.Ldarg_0);
-            removeIL.Emit(OpCodes.Ldfld, backingField);
-            removeIL.Emit(OpCodes.Ldarg_1);
-            //Delegate.Remove(Delegate, Delegate)
-            removeIL.Emit(OpCodes.Call, type.Module.Import(new TypeReference("System", "Delegate", type.Module, type.Module.TypeSystem.Corlib).Resolve().Methods.First(x => x.Name == "Remove" && x.IsStatic && x.Parameters.Count == 2 && x.Parameters.All(p => p.ParameterType.FullName == "System.Delegate"))));
-            removeIL.Emit(OpCodes.Castclass, eventType);
-            removeIL.Emit(OpCodes.Stfld, backingField);
-            removeIL.Emit(OpCodes.Ret);
+            //Checks if the destination type is an interface
+            if (type.IsInterface)
+                evt.RemoveMethod.Attributes |= MethodAttributes.NewSlot | MethodAttributes.CheckAccessOnOverride | MethodAttributes.Abstract | MethodAttributes.Virtual;
+            else
+            {
+                //Writes the instruction of the removeon method
+                var removeBody = evt.RemoveMethod.Body;
+                removeBody.MaxStackSize = 8;
+                removeBody.GetType().GetField("code_size", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).SetValue(removeBody, 1);
+                var removeIL = removeBody.GetILProcessor();
+                removeIL.Emit(OpCodes.Ldarg_0);
+                removeIL.Emit(OpCodes.Ldarg_0);
+                removeIL.Emit(OpCodes.Ldfld, backingField);
+                removeIL.Emit(OpCodes.Ldarg_1);
+                //Delegate.Remove(Delegate, Delegate)
+                removeIL.Emit(OpCodes.Call, type.Module.Import(new TypeReference("System", "Delegate", type.Module, type.Module.TypeSystem.Corlib).Resolve().Methods.First(x => x.Name == "Remove" && x.IsStatic && x.Parameters.Count == 2 && x.Parameters.All(p => p.ParameterType.FullName == "System.Delegate"))));
+                removeIL.Emit(OpCodes.Castclass, eventType);
+                removeIL.Emit(OpCodes.Stfld, backingField);
+                removeIL.Emit(OpCodes.Ret);
+            }
 
             //Adds the members to the type
             type.Methods.Add(evt.AddMethod);
             type.Methods.Add(evt.RemoveMethod);
             type.Events.Add(evt);
+            evt.AddMethod.Overrides.Clear();
+            evt.RemoveMethod.Overrides.Clear();
 
             //Creates the nodes
             if (node is TypeTreeNode)
             {
-                node.Children.Add(new ILEditTreeNode(backingField, true));
+                if (!type.IsInterface)
+                    node.Children.Add(new ILEditTreeNode(backingField, true));
                 node.Children.Add(new ILEditTreeNode(evt, false));
                 TreeHelper.SortChildren((TypeTreeNode)node);
             }
