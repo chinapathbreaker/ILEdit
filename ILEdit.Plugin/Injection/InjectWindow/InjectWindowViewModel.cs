@@ -129,6 +129,16 @@ namespace ILEdit.Injection
                     //Injects
                     this.SelectedInjector.Inject(_node, this.Name, this.SelectedInjector.NeedsMember ? this.SelectedMember : null);
                     ICSharpCode.ILSpy.MainWindow.Instance.RefreshDecompiledView();
+                    
+                    //Colors the parents of the node
+                    var parent = (ICSharpCode.TreeView.SharpTreeNode)_node;
+                    while (parent != null)
+                    {
+                        parent.Foreground = GlobalContainer.ModifiedNodesBrush;
+                        parent = parent.Parent;
+                    }
+
+                    //Break
                     break;
                
                 //Inject existing

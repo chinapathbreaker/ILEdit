@@ -34,7 +34,7 @@ namespace ILEdit
             _manuallyFilledChildren = manuallyFilledChildren;
 
             //Sets the foreground
-            this.Foreground = GlobalContainer.ModifiedNodesBrush;
+            this.Foreground = GlobalContainer.NewNodesBrush;
         }
 
         /// <summary>

@@ -52,7 +52,7 @@ namespace ILEdit.ContextMenu
 
                 //Refreshes the view
                 MainWindow.Instance.RefreshDecompiledView();
-                selectedNodes[0].Foreground = ILEdit.GlobalContainer.ModifiedNodesBrush;
+                selectedNodes[0].Foreground = ILEdit.GlobalContainer.NewNodesBrush;
                 MainWindow.Instance.RefreshTreeViewFilter();
             }
         }
