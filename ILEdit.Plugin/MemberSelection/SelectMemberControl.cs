@@ -78,7 +78,7 @@ namespace ILEdit
         protected override void OnSelectionChanged(System.Windows.Controls.SelectionChangedEventArgs e)
         {
             //Selected item
-            var selected = (e.AddedItems == null || e.AddedItems.Count == 0 || e.AddedItems[0] == null) ? null : ((ILEditTreeNode)e.AddedItems[0]).TokenProvider;
+            var selected = (e.AddedItems == null || e.AddedItems.Count == 0 || e.AddedItems[0] == null || !(e.AddedItems[0] is ILEditTreeNode)) ? null : ((ILEditTreeNode)e.AddedItems[0]).TokenProvider;
 
             //Checks the token
             if (selected == null || !SelectableMembers.Any(x => x == selected.MetadataToken.TokenType))

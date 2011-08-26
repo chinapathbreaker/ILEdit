@@ -93,7 +93,28 @@ namespace ILEdit
                 children = ((AssemblyDefinition)_tokenProvider).Modules;
             //Module
             else if (_tokenProvider is ModuleDefinition)
-                children = ((ModuleDefinition)_tokenProvider).Types;
+            {
+                //Types
+                IEnumerable<TypeDefinition> types = ((ModuleDefinition)_tokenProvider).Types;
+                if (this.ChildrenFilter != null)
+                    types = types.Where(x => this.ChildrenFilter(x));
+
+                //Groups the types by namespace and adds
+                foreach (var node in types.GroupBy(x => x.Namespace)
+                                     .Select(x =>
+                                     {
+                                         var n = new NamespaceTreeNode(x.Key);
+                                         foreach (var t in x)
+                                             n.Children.Add(new ILEditTreeNode(t, false) { ChildrenFilter = this.ChildrenFilter, Foreground = this.Foreground });
+                                         return n;
+                                     })) 
+                {
+                    this.Children.Add(node);
+                }
+
+                //Returns
+                return;
+            }
             //Type
             else if (_tokenProvider is TypeDefinition)
             {
