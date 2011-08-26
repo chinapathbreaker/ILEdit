@@ -7,6 +7,8 @@ using System.Windows.Media;
 using System.ComponentModel;
 using System.Windows;
 using Mono.Cecil;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ILEdit.Injection
 {
@@ -115,6 +117,11 @@ namespace ILEdit.Injection
         /// </summary>
         public IMetadataTokenProvider ExistingSelectedMember { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether to import a new type as nested type or not
+        /// </summary>
+        public bool ExistingImportAsNestedTypes { get; set; }
+
         #endregion
 
         #region Inject command
@@ -166,6 +173,42 @@ namespace ILEdit.Injection
                
                 //Inject existing
                 case 1:
+
+                    //Cancellation token
+                    var cts = new CancellationTokenSource();
+                    var ct = cts.Token;
+
+                    //Starts a new task to perform importing
+                    var t = new Task(() => {
+                        
+                        //Imports
+                        using (var importer = ILEdit.Injection.Existing.MemberImporterFactory.Create(ExistingSelectedMember, _node is ModuleTreeNode ? ((ModuleTreeNode)_node).Module : (IMetadataTokenProvider)((IMemberTreeNode)_node).Member))
+                            importer.Import(new Existing.MemberImportingOptions() {
+                                ImportAsNestedType = ExistingImportAsNestedTypes,
+                                CancellationToken = ct
+                            });
+
+                    }, ct);
+                    t.Start();
+                    t.ContinueWith(task => {
+
+                        //Hides the window
+                        Application.Current.Dispatcher.Invoke((Action)WaitWindow.Hide, null);
+
+                        //Checks for any exception
+                        if (task.Exception != null)
+                        {
+                            var text = string.Join(Environment.NewLine + Environment.NewLine, task.Exception.InnerExceptions.Select(x => x.Message).ToArray());
+                            Application.Current.Dispatcher.BeginInvoke((Action)(() => {
+                                MessageBox.Show("An exception occurred:" + Environment.NewLine + Environment.NewLine + text, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            }), null);
+                        }
+
+                    });
+
+                    //Shows the wait window
+                    WaitWindow.ShowDialog("Importing in progress ...", "Please, wait while the importing is in progress ...", cts);
+
                     break;
                 
                 //Other: exception

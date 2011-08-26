@@ -25,6 +25,9 @@ namespace ILEdit.Injection.Existing.Importers
 
         protected override void ScanCore(MemberImportingOptions options, List<MemberImporter> importList)
         {
+            //Checks that the task hasn't been canceled
+            options.CancellationToken.ThrowIfCancellationRequested();
+
             //Clones the attributes
             attribs = ((ICustomAttributeProvider)Member).CustomAttributes.Select(x => x.Clone()).ToArray();
 
@@ -34,6 +37,9 @@ namespace ILEdit.Injection.Existing.Importers
             //Checks the attributes
             foreach (var x in attribs)
             {
+                //Checks that the task hasn't been canceled
+                options.CancellationToken.ThrowIfCancellationRequested();
+
                 var a = x;
                 //Imports the type of the attribute
                 var typeImporter = Helpers.CreateTypeImporter(a.AttributeType.Resolve(), destType, importList, options);
@@ -58,6 +64,9 @@ namespace ILEdit.Injection.Existing.Importers
 
         protected override Mono.Cecil.IMetadataTokenProvider ImportCore(MemberImportingOptions options)
         {
+            //Checks that the task hasn't been canceled
+            options.CancellationToken.ThrowIfCancellationRequested();
+
             //Destination
             var dest = (ICustomAttributeProvider)Destination;
 

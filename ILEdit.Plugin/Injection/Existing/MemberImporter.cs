@@ -120,10 +120,11 @@ namespace ILEdit.Injection.Existing
             foreach (var x in _importList)
                 x.Import(options);
             
-            //Invokes the event
+            //Imports and invokes the event
+            var ret = ImportCore(options);
             var evt = ImportFinished;
             if (evt != null)
-                evt(ImportCore(options));
+                evt(ret);
         }
         protected abstract IMetadataTokenProvider ImportCore(MemberImportingOptions options);
 

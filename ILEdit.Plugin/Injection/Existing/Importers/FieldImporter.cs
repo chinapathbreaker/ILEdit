@@ -25,6 +25,9 @@ namespace ILEdit.Injection.Existing.Importers
 
         protected override void ScanCore(MemberImportingOptions options, List<MemberImporter> importList)
         {
+            //Checks that the task hasn't been canceled
+            options.CancellationToken.ThrowIfCancellationRequested();
+
             //Field
             fieldClone = ((FieldDefinition)Member).Clone();
 
@@ -46,6 +49,9 @@ namespace ILEdit.Injection.Existing.Importers
 
         protected override IMetadataTokenProvider ImportCore(MemberImportingOptions options)
         {
+            //Checks that the task hasn't been canceled
+            options.CancellationToken.ThrowIfCancellationRequested();
+
             //Adds the field to the destination type
             ((TypeDefinition)Destination).Fields.Add(fieldClone);
 

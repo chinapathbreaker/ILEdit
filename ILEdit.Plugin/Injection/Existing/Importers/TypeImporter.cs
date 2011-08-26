@@ -22,6 +22,9 @@ namespace ILEdit.Injection.Existing.Importers
 
         protected override void ScanCore(MemberImportingOptions options, List<MemberImporter> importList)
         {
+            //Checks that the task hasn't been canceled
+            options.CancellationToken.ThrowIfCancellationRequested();
+
             //Clones the type
             typeClone = ((TypeDefinition)Member).Clone();
 
@@ -37,6 +40,7 @@ namespace ILEdit.Injection.Existing.Importers
             //Registers the importing of the fields
             foreach (var f in typeClone.Fields)
             {
+                options.CancellationToken.ThrowIfCancellationRequested();
                 importList.Add(new FieldImporter(f, typeClone));
                 typeClone.Fields.Clear();
             }
@@ -46,6 +50,9 @@ namespace ILEdit.Injection.Existing.Importers
 
         protected override IMetadataTokenProvider ImportCore(MemberImportingOptions options)
         {
+            //Checks that the task hasn't been canceled
+            options.CancellationToken.ThrowIfCancellationRequested();
+
             //Checks if the destination is a module or a type
             if (Destination is ModuleDefinition)
             {

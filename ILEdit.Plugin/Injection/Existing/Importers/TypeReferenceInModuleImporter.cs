@@ -23,10 +23,15 @@ namespace ILEdit.Injection.Existing.Importers
 
         protected override void ScanCore(MemberImportingOptions options, List<MemberImporter> importList)
         {
+            //Checks that the task hasn't been canceled
+            options.CancellationToken.ThrowIfCancellationRequested();
         }
 
         protected override IMetadataTokenProvider ImportCore(MemberImportingOptions options)
         {
+            //Checks that the task hasn't been canceled
+            options.CancellationToken.ThrowIfCancellationRequested();
+
             //Imports and returns
             return ((ModuleDefinition)Destination).Import((TypeReference)Member);
         }

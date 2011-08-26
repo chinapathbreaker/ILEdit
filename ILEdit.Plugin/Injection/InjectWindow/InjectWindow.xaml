@@ -180,7 +180,7 @@
                         	<GroupBox.Header>
                         		<TextBlock TextWrapping="Wrap" Text="Options" FontWeight="Bold"/>
                         	</GroupBox.Header>
-                        	<CheckBox Content="Force cloning of public dependencies" ToolTip="If checked, even the publicy available dependencies of the selected object will be copied to the destination. If not checked, only the selected member (along with its dependencies internal to its assembly) will be cloned to the destination, and the public dependencies will be normally referenced"/>
+                            <CheckBox Content="Import as nested types" IsChecked="{Binding ImportAsNestedTypes, Mode=TwoWay}" ToolTip="Gets or sets a value indicating whether to import a new type as nested type or not"/>
                         </GroupBox>
                     </Grid>
                 </TabItem>

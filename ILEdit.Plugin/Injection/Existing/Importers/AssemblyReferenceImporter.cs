@@ -20,10 +20,15 @@ namespace ILEdit.Injection.Existing.Importers
 
         protected override void ScanCore(MemberImportingOptions options, List<MemberImporter> importList)
         {
+            //Checks that the task hasn't been canceled
+            options.CancellationToken.ThrowIfCancellationRequested();
         }
 
         protected override IMetadataTokenProvider ImportCore(MemberImportingOptions options)
         {
+            //Checks that the task hasn't been canceled
+            options.CancellationToken.ThrowIfCancellationRequested();
+
             //Assembly and module
             var asm = (AssemblyDefinition)Member;
             var module = ((ModuleDefinition)Destination);
