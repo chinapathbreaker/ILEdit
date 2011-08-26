@@ -131,8 +131,8 @@
         </Grid.RowDefinitions>
 		<StackPanel Orientation="Horizontal" Margin="5,7" Grid.ColumnSpan="2">
 			<TextBlock TextWrapping="Wrap" VerticalAlignment="Center" Margin="0"><Run Language="it-it" Text="Inject in"/></TextBlock>
-			<Image Source="{Binding InjectInIcon}" Width="16" Height="16" Margin="15,0,0,0"/>
-			<ContentControl Content="{Binding InjectInContent}" FontWeight="Bold" Padding="5,0,0,0" Margin="5,0,0,0"/>
+			<Image Source="{Binding InjectInIcon}" Width="16" Height="16" Margin="15,0,0,0" d:LayoutOverrides="Height"/>
+			<ContentControl Content="{Binding InjectInContent}" FontWeight="Bold" Padding="5,0,0,0" Margin="5,0,0,0" Height="16"/>
 		</StackPanel>
 		<Border Grid.Row="1" Background="White" Grid.ColumnSpan="2">
 			<TabControl TabStripPlacement="Left" BorderThickness="1,0,0,0" SelectedIndex="{Binding TabSelectedIndex, Mode=TwoWay}">
@@ -160,7 +160,28 @@
 						</StackPanel>
 					</TabItem.Header>
                     <Grid>
-                        <local:SelectMemberControl BorderBrush="Transparent" BorderThickness="0" SelectableMembers="{Binding ExistingSelectableMembers}" MemberFilter="{Binding ExistingMemberFilter}" SelectedMember="{Binding ExistingSelectedMember, Mode=OneWayToSource}" />
+                    	<Grid.RowDefinitions>
+                    		<RowDefinition Height="Auto"/>
+                    		<RowDefinition/>
+                    		<RowDefinition Height="Auto"/>
+                    	</Grid.RowDefinitions>
+                        <TextBlock TextWrapping="Wrap" d:LayoutOverrides="Height" Margin="0,0,0,10">
+                            <Run Language="it-it" Text="Select the object you would like to copy in" BaselineAlignment="Center"/>
+                            <InlineUIContainer BaselineAlignment="Center">
+                        		<Image Source="{Binding InjectInIcon}" Width="16" Height="16" Margin="3,0,0,0" d:LayoutOverrides="Height"/>
+                        	</InlineUIContainer>
+                            <InlineUIContainer BaselineAlignment="Center">
+                        		<ContentControl Content="{Binding InjectInContent}" FontWeight="Bold" Padding="5,0,0,0" Margin="5,0,0,0" Height="16"/>
+                        	</InlineUIContainer>
+                            <Run Language="it-it" Text="."/>
+                        </TextBlock>
+                        <local:SelectMemberControl BorderBrush="Transparent" BorderThickness="0" SelectableMembers="{Binding ExistingSelectableMembers}" MemberFilter="{Binding ExistingMemberFilter}" SelectedMember="{Binding ExistingSelectedMember, Mode=OneWayToSource}" Grid.Row="1" />
+                        <GroupBox d:LayoutOverrides="Height" Grid.Row="2" Margin="0,10,0,0" Padding="0,5">
+                        	<GroupBox.Header>
+                        		<TextBlock TextWrapping="Wrap" Text="Options" FontWeight="Bold"/>
+                        	</GroupBox.Header>
+                        	<CheckBox Content="Force cloning of public dependencies" ToolTip="If checked, even the publicy available dependencies of the selected object will be copied to the destination. If not checked, only the selected member (along with its dependencies internal to its assembly) will be cloned to the destination, and the public dependencies will be normally referenced"/>
+                        </GroupBox>
                     </Grid>
                 </TabItem>
 			</TabControl>

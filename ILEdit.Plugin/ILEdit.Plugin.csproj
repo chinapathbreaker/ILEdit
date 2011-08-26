@@ -55,6 +55,20 @@
     <Compile Include="Converters\AllTrueMultiConverter.cs" />
     <Compile Include="GlobalContainer.cs" />
     <Compile Include="ILEditTreeNode.cs" />
+    <Compile Include="Injection\Existing\Importers\AssemblyReferenceImporter.cs" />
+    <Compile Include="Injection\Existing\Importers\CustomAttributesImporter.cs" />
+    <Compile Include="Injection\Existing\Importers\FieldImporter.cs" />
+    <Compile Include="Injection\Existing\Helpers.cs" />
+    <Compile Include="Injection\Existing\Helpers1.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Helpers.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Injection\Existing\MemberImporter.cs" />
+    <Compile Include="Injection\Existing\MemberImporterFactory.cs" />
+    <Compile Include="Injection\Existing\MemberImportingOptions.cs" />
+    <Compile Include="Injection\Existing\Importers\TypeImporter.cs" />
+    <Compile Include="Injection\Existing\Importers\TypeReferenceInModuleImporter.cs" />
     <Compile Include="Injection\IInjector.cs" />
     <Compile Include="Injection\Injectors\AssemblyReferenceInjector.cs" />
     <Compile Include="Injection\Injectors\ClassInjector.cs" />
@@ -152,6 +166,15 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\GenericType.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Injection\Existing\Helpers.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Helpers1.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

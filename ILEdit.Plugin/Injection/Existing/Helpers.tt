@@ -1,0 +1,130 @@
+﻿<#@ template  debug="true" hostSpecific="true" #>
+<#@ output extension=".cs" #>
+<#@ Assembly Name="System.Core.dll" #>
+<#@ Assembly Name="System.Windows.Forms.dll" #>
+<#@ Assembly Name="$(SolutionDir)\ILSpy\bin\Debug\Mono.Cecil.dll" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Diagnostics" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #> 
+<#@ import namespace="System.Reflection" #>
+<#@ import namespace="Mono.Cecil" #>
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Mono.Cecil;
+
+namespace ILEdit.Injection.Existing
+{
+    internal static partial class Helpers
+    {
+        #region FieldDefinition.Clone() extension
+        
+        /// <summary>
+        /// Clones this field
+        /// </summary>
+        /// <param name="field"></param>
+        /// <returns></returns>
+        public static FieldDefinition Clone(this FieldDefinition field)
+        {
+            var f = new FieldDefinition(field.Name, field.Attributes, field.FieldType) 
+                {
+<# /* Properties */ #>
+<#= string.Join(
+        "," + Environment.NewLine, 
+        typeof(FieldDefinition)
+            .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+            .Where(x => x.Name != "Name" && x.Name != "Attributes" && x.Name != "FieldType" && x.Name != "DeclaringType" && !x.Name.StartsWith("Is"))
+			.Where(x => x.CanWrite)
+            .Select(x => "\t\t\t\t\t" + x.Name + " = field." + x.Name)
+            .ToArray()
+    )#>
+                };
+<# /* Collections */ #>
+<# foreach (var p in typeof(FieldDefinition)
+		             .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+		             .Where(x => x.Name != "Name" && x.Name != "Attributes" && x.Name != "FieldType" && x.Name != "DeclaringType" && !x.Name.StartsWith("Is"))
+		             .Where(x => !x.PropertyType.IsArray && x.PropertyType.GetInterface("ICollection") != null)) { #>
+			foreach (var x in field.<#=p.Name#>)
+				f.<#=p.Name#>.Add(x);
+<# } #>
+			return f;
+        }
+
+        #endregion
+		
+		#region CustomAttribute.Clone() extension
+        
+        /// <summary>
+        /// Clones this custom attribute
+        /// </summary>
+        /// <param name="field"></param>
+        /// <returns></returns>
+        public static CustomAttribute Clone(this CustomAttribute attr)
+        {
+            var a = new CustomAttribute(attr.Constructor) 
+                {
+<# /* Properties */ #>
+<#= string.Join(
+        "," + Environment.NewLine, 
+        typeof(CustomAttribute)
+            .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+            .Where(x => x.Name != "Constructor")
+			.Where(x => x.CanWrite)
+            .Select(x => "\t\t\t\t\t" + x.Name + " = attr." + x.Name)
+            .ToArray()
+    )#>
+                };
+<# /* Collections */ #>
+<# foreach (var p in typeof(CustomAttribute)
+		             .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+		             .Where(x => x.Name != "Constructor")
+		             .Where(x => !x.PropertyType.IsArray && x.PropertyType.GetInterface("ICollection") != null)) { #>
+			foreach (var x in attr.<#=p.Name#>)
+				a.<#=p.Name#>.Add(x);
+<# } #>
+			return a;
+        }
+
+        #endregion
+		
+		#region TypeDefinition.Clone() extension
+        
+        /// <summary>
+        /// Clones this type
+        /// </summary>
+        /// <param name="field"></param>
+        /// <returns></returns>
+        public static TypeDefinition Clone(this TypeDefinition type)
+        {
+            var t = new TypeDefinition(type.Namespace, type.Name, type.Attributes, type.BaseType) 
+                {
+<# /* Properties */ #>
+<#= string.Join(
+        "," + Environment.NewLine, 
+        typeof(TypeDefinition)
+            .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+            .Where(x => x.Name != "Namespace" && x.Name != "Name" && x.Name != "Attributes" && x.Name != "BaseType" && x.Name != "DeclaringType" && !x.Name.StartsWith("Is"))
+			.Where(x => x.CanWrite)
+            .Select(x => "\t\t\t\t\t" + x.Name + " = type." + x.Name)
+            .ToArray()
+    )#>
+                };
+<# /* Collections */ #>
+<# foreach (var p in typeof(TypeDefinition)
+		             .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+		             .Where(x => x.Name != "Constructor")
+		             .Where(x => !x.PropertyType.IsArray && x.PropertyType.GetInterface("ICollection") != null)) { #>
+			foreach (var x in type.<#=p.Name#>)
+				t.<#=p.Name#>.Add(x);
+<# } #>
+			return t;
+        }
+
+        #endregion
+    }
+}
