@@ -79,6 +79,11 @@ namespace ILEdit.Injection.Existing.Importers
             return null;
         }
 
+        protected override IEnumerable<IMetadataTokenProvider> GetMembersForPreview()
+        {
+            return base.GetMembersForPreview().Except(new IMetadataTokenProvider[] { Member });
+        }
+
         protected override void DisposeCore()
         {
             //Clears the array

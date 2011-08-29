@@ -166,7 +166,7 @@
                     		<RowDefinition Height="Auto"/>
                     	</Grid.RowDefinitions>
                         <TextBlock TextWrapping="Wrap" d:LayoutOverrides="Height" Margin="0,0,0,10">
-                            <Run Language="it-it" Text="Select the object you would like to copy in" BaselineAlignment="Center"/>
+                            <Run Language="it-it" Text="Select the object you would like to import in" BaselineAlignment="Center"/>
                             <InlineUIContainer BaselineAlignment="Center">
                         		<Image Source="{Binding InjectInIcon}" Width="16" Height="16" Margin="3,0,0,0" d:LayoutOverrides="Height"/>
                         	</InlineUIContainer>
@@ -180,7 +180,10 @@
                         	<GroupBox.Header>
                         		<TextBlock TextWrapping="Wrap" Text="Options" FontWeight="Bold"/>
                         	</GroupBox.Header>
-                            <CheckBox Content="Import as nested types" IsChecked="{Binding ImportAsNestedTypes, Mode=TwoWay}" ToolTip="Gets or sets a value indicating whether to import a new type as nested type or not"/>
+                            <StackPanel>
+                                <CheckBox Content="Preview" IsChecked="{Binding ExistingPreview, Mode=TwoWay}" ToolTip="Gets or sets a value indicating whether to show a preview before performing the actual importing"/>
+                                <CheckBox Content="Import as nested types" IsChecked="{Binding ExistingImportAsNestedTypes, Mode=TwoWay}" ToolTip="Gets or sets a value indicating whether to import a new type as nested type or not"/>
+                            </StackPanel>
                         </GroupBox>
                     </Grid>
                 </TabItem>

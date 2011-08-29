@@ -17,6 +17,32 @@ namespace ILEdit
     /// </summary>
     internal class ILEditTreeNode : ILSpyTreeNode, IMemberTreeNode
     {
+        #region ReferenceFolderNode
+        internal class ReferenceFolderNode : ILSpyTreeNode
+        {
+            public ReferenceFolderNode()
+            {
+                this.IsExpanded = true;
+            }
+            public override object Icon
+            {
+                get { return new BitmapImage(new Uri("pack://application:,,,/ILSpy;component/Images/ReferenceFolder.Closed.png")); }
+            }
+            public override object ExpandedIcon
+            {
+                get { return new BitmapImage(new Uri("pack://application:,,,/ILSpy;component/Images/ReferenceFolder.Open.png")); }
+            }
+            public override object Text
+            {
+                get { return "References"; }
+            }
+            public override void Decompile(Language language, ITextOutput output, DecompilationOptions options)
+            {
+                throw new NotImplementedException();
+            }
+        }
+        #endregion
+
         private IMetadataTokenProvider _tokenProvider;
         private Language language;
         private bool _manuallyFilledChildren;
@@ -101,10 +127,11 @@ namespace ILEdit
 
                 //Groups the types by namespace and adds
                 foreach (var node in types.GroupBy(x => x.Namespace)
+                                     .OrderBy(x => x.Key)
                                      .Select(x =>
                                      {
                                          var n = new NamespaceTreeNode(x.Key);
-                                         foreach (var t in x)
+                                         foreach (var t in x.OrderBy(y => y.Name))
                                              n.Children.Add(new ILEditTreeNode(t, false) { ChildrenFilter = this.ChildrenFilter, Foreground = this.Foreground });
                                          return n;
                                      })) 
@@ -259,6 +286,8 @@ namespace ILEdit
                         return ((AssemblyDefinition)_tokenProvider).Name.Name;
                     else if (_tokenProvider is ModuleDefinition)
                         return ((ModuleDefinition)_tokenProvider).Name;
+                    else if (_tokenProvider is AssemblyNameReference)
+                        return ((AssemblyNameReference)_tokenProvider).Name;
                     else if (_tokenProvider is IMemberDefinition)
                         return ((IMemberDefinition)_tokenProvider).Name;
                     else if (_tokenProvider is MemberReference)

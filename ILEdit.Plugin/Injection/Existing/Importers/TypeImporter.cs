@@ -31,7 +31,7 @@ namespace ILEdit.Injection.Existing.Importers
             //Registers the importing of the custom attributes of this class
             if (typeClone.HasCustomAttributes)
             {
-                importList.Add(new CustomAttributesImporter(typeClone, typeClone));
+                importList.Add(new CustomAttributesImporter(typeClone, typeClone).Scan(options));
                 typeClone.CustomAttributes.Clear();
             }
 
@@ -41,7 +41,7 @@ namespace ILEdit.Injection.Existing.Importers
             foreach (var f in typeClone.Fields)
             {
                 options.CancellationToken.ThrowIfCancellationRequested();
-                importList.Add(new FieldImporter(f, typeClone));
+                importList.Add(new FieldImporter(f, typeClone).Scan(options));
                 typeClone.Fields.Clear();
             }
 

@@ -1,0 +1,31 @@
+﻿<Window
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:treeview="http://icsharpcode.net/sharpdevelop/treeview" x:Class="ILEdit.Injection.Existing.PreviewWindow"
+             mc:Ignorable="d" 
+             Width="500" Height="350" Title="Preview" ShowInTaskbar="False" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+	<Grid Margin="5">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition/>
+			<RowDefinition Height="Auto"/>
+		</Grid.RowDefinitions>
+		<TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" d:LayoutOverrides="Height" Margin="0,0,0,10">
+            <Run Language="it-it" Text="This is the preview of the objects that will be imported in " BaselineAlignment="Center"/>
+            <InlineUIContainer BaselineAlignment="Center">
+				<Image x:Name="ImgIcon" Width="16" Height="16" Margin="0,0,5,0"/>
+			</InlineUIContainer>
+            <Run x:Name="LblText" FontWeight="Bold" BaselineAlignment="Center"/>
+            <Run BaselineAlignment="Center" Text="."/>
+            <LineBreak />
+            <Run Text="The colored elements are the ones that will be actually imported." />
+        </TextBlock>
+		<treeview:SharpTreeView Name="Tree" d:LayoutOverrides="Height" Grid.Row="1" ShowRoot="False" BorderBrush="Transparent" BorderThickness="0" />
+		<StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+            <Button Content="Ok" FontWeight="Bold" FontSize="14.667" Width="60" Click="BtnOk_Click" />
+            <Button Content="Cancel" IsCancel="True" VerticalAlignment="Bottom" Width="60" Margin="5,0,0,0"/>
+        </StackPanel>
+	</Grid>
+</Window>

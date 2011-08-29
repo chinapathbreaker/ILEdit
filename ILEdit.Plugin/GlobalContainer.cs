@@ -21,6 +21,7 @@ namespace ILEdit
         static GlobalContainer()
         {
             //Sets the brushes
+            NormalNodesBrush = new SolidColorBrush(Colors.Black);
             NewNodesBrush = new SolidColorBrush(Colors.Red);
             ModifiedNodesBrush = new SolidColorBrush(Color.FromArgb(255, 230, 96, 6));
 
@@ -140,16 +141,17 @@ namespace ILEdit
 
         #endregion
 
-        #region NewNodesBrush
+        #region Brushes
+
+        /// <summary>
+        /// Returns the color used to identify the normal nodes
+        /// </summary>
+        public static Brush NormalNodesBrush { get; private set; }
 
         /// <summary>
         /// Returns the color used to identify the new nodes
         /// </summary>
         public static Brush NewNodesBrush { get; private set; }
-
-        #endregion
-
-        #region ModifiedNodesBrush
 
         /// <summary>
         /// Returns the color used to identify the modified nodes

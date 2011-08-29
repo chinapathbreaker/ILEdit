@@ -9,7 +9,7 @@ namespace ILEdit.Converters
     {
         public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            return values.Cast<bool>().All(x => x);
+            return values.OfType<bool>().All(x => x);
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)

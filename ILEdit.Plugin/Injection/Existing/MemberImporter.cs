@@ -2,7 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ICSharpCode.ILSpy;
+using ICSharpCode.ILSpy.TreeNodes;
+using ICSharpCode.TreeView;
 using Mono.Cecil;
+using System.Windows.Media;
 
 namespace ILEdit.Injection.Existing
 {
@@ -11,6 +15,8 @@ namespace ILEdit.Injection.Existing
     /// </summary>
     public abstract class MemberImporter : IDisposable
     {
+        private List<MemberImporter> _importList = null;
+
         #region .ctor
 
         /// <summary>
@@ -31,7 +37,7 @@ namespace ILEdit.Injection.Existing
 
         #endregion
 
-        #region Properties
+        #region Properties Member, Destination and Scanned
 
         private IMetadataTokenProvider _member;
         /// <summary>
@@ -61,7 +67,7 @@ namespace ILEdit.Injection.Existing
 
         #endregion
 
-        #region Methods
+        #region CanImport method
 
         /// <summary>
         /// Returns a value indicating whether this importer can import a member in the destination
@@ -82,12 +88,14 @@ namespace ILEdit.Injection.Existing
         }
         protected abstract bool CanImportCore(IMetadataTokenProvider member, IMetadataTokenProvider destination);
 
-        private List<MemberImporter> _importList = null;
+        #endregion
+
+        #region Scan method
 
         /// <summary>
         /// Performs a scanning of the member
         /// </summary>
-        public void Scan(MemberImportingOptions options)
+        public MemberImporter Scan(MemberImportingOptions options)
         {
             //Checks that options isn't null
             if (options == null)
@@ -100,8 +108,15 @@ namespace ILEdit.Injection.Existing
             //Performs the scanning
             _importList = new List<MemberImporter>();
             ScanCore(options, _importList);
+
+            //Fluid interface: returns this
+            return this;
         }
         protected abstract void ScanCore(MemberImportingOptions options, List<MemberImporter> importList);
+
+        #endregion
+
+        #region Import method
 
         /// <summary>
         /// Performs the importing
@@ -127,6 +142,176 @@ namespace ILEdit.Injection.Existing
                 evt(ret);
         }
         protected abstract IMetadataTokenProvider ImportCore(MemberImportingOptions options);
+
+        #endregion
+
+        #region BuildPreviewNodes method
+
+        /// <summary>
+        /// Fills the given node with the nodes necessary for the preview of the importing. This action requires a call to Scan()
+        /// </summary>
+        /// <param name="root"></param>
+        public void BuildPreviewNodes(SharpTreeNode root)
+        {
+            //Checks that the root node isn't null
+            if (root == null)
+                throw new ArgumentNullException("root");
+
+            //Checks if Scan() has already been called
+            if (!Scanned)
+                throw new InvalidOperationException("Cannot build preview nodes before a call to Scan()");
+
+            //Gets the members needed by the import list and by this instance
+            var members = GetMembersForPreview().ToArray();
+
+            //Checks that there's at least one element
+            if (members.Length == 0)
+                return;
+
+            //Builds up to the type nodes
+            var typeNodes = BuildTypeNodes(members);
+
+            //Lists of the assembly and module nodes (needed for preview of assembly references)
+            var asmNodes = new List<ILEditTreeNode>();
+            var moduleNodes = new List<ILEditTreeNode>();
+
+            //Groups by assembly, module and then namespace
+            var grouped =
+                typeNodes.GroupBy(x => x.Member.Module)
+                .OrderBy(x => x.Key.Name)
+                .Select(x => x.OrderBy(y => y.Text.ToString()).GroupBy(y => ((TypeDefinition)y.Member).Namespace).OrderBy(y => y.Key).GroupBy(y => x.Key).ElementAt(0))
+                .GroupBy(x => x.Key.Assembly)
+                .OrderBy(x => x.Key.Name.Name)
+                .Select(x =>
+                {
+                    //Assembly node
+                    var asmNode = new ILEditTreeNode(x.Key, true) { IsExpanded = true, Foreground = GlobalContainer.NormalNodesBrush };
+                    foreach (var m in x)
+                    {
+                        //Module node
+                        var moduleNode = new ILEditTreeNode(m.Key, true) { IsExpanded = true, Foreground = GlobalContainer.NormalNodesBrush };
+                        foreach (var n in m)
+                        {
+                            //Namespace node
+                            var namespaceNode = new NamespaceTreeNode(n.Key) { IsExpanded = true, Foreground = GlobalContainer.NormalNodesBrush };
+                            foreach (var t in n)
+                                namespaceNode.Children.Add(t);
+                            moduleNode.Children.Add(namespaceNode);
+                        }
+                        moduleNodes.Add(moduleNode);
+                        asmNode.Children.Add(moduleNode);
+                    }
+                    asmNodes.Add(asmNode);
+                    return asmNode;
+                });
+
+            //Clears the root
+            root.Children.Clear();
+
+            //Adds the nodes to the root
+            foreach (var x in grouped)
+                root.Children.Add(x);
+
+            //Groups the references by module
+            var references =
+                members.OfType<Importers.AssemblyReferenceImporter>()
+                .GroupBy(
+                    x => (ModuleDefinition)x.Destination,
+                    x => (AssemblyNameReference)x.Member
+                );
+
+            //Creates the references nodes
+            foreach(var refs in references)
+            {
+                //Creates and populates the references node
+                var refFolder = new ILEditTreeNode.ReferenceFolderNode();
+                foreach (var r in refs)
+                    refFolder.Children.Add(new ILEditTreeNode(r, true) { 
+                        IsExpanded = true, 
+                        Foreground = GlobalContainer.ModifiedNodesBrush 
+                    });
+                
+                //Finds the module node to add to
+                var moduleNode = moduleNodes.FirstOrDefault(x => (ModuleDefinition)x.TokenProvider == refs.Key);
+                if (moduleNode != null)
+                {
+                    //Adds the references to the module node
+                    moduleNode.Children.Add(refFolder);
+                }
+                else
+                {
+                    //Finds or creates the assembly node
+                    var asmNode = asmNodes.FirstOrDefault(x => (AssemblyDefinition)x.TokenProvider == refs.Key.Assembly);
+                    if (asmNode != null)
+                    {
+                        //Adds a module node to the assembly
+                        asmNode.Children.Add(new ILEditTreeNode(refs.Key, true) { 
+                            IsExpanded = true, 
+                            Foreground = GlobalContainer.NormalNodesBrush, 
+                            Children = { refFolder } 
+                        });
+                    }
+                    else
+                    {
+                        //Creates the nodes and adds it to the root
+                        root.Children.Add(new ILEditTreeNode(refs.Key.Assembly, true) {
+                            IsExpanded = true,
+                            Foreground = GlobalContainer.NormalNodesBrush,
+                            Children = {
+                                new ILEditTreeNode(refs.Key, true) {
+                                IsExpanded = true,
+                                Foreground = GlobalContainer.NormalNodesBrush,
+                                    Children = { refFolder }
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        }
+
+        protected virtual IEnumerable<IMetadataTokenProvider> GetMembersForPreview() 
+        {
+            return _importList.SelectMany(x => x.GetMembersForPreview()).Concat(new IMetadataTokenProvider[] { Member });
+        }
+
+        private IEnumerable<ILEditTreeNode> BuildTypeNodes(IMetadataTokenProvider[] members)
+        {
+            //Type-node mapping dictionary
+            var typeMapDic = new Dictionary<TypeDefinition, ILEditTreeNode>();
+
+            //Function to get or create a type-node from the dictionary
+            Func<TypeDefinition, Brush, ILEditTreeNode> GetOrCreate = (x, b) => {
+                ILEditTreeNode ret;
+                if (!typeMapDic.TryGetValue(x, out ret))
+                {
+                    ret = new ILEditTreeNode(x, true) { IsExpanded = true, Foreground = b };
+                    typeMapDic.Add(x, ret);
+                }
+                return ret;
+            };
+
+            //Foreach member
+            foreach (var x in members.Where(m => m is IMemberDefinition))
+            {
+                //Checks if this member is a type or not
+                if (x is TypeDefinition)
+                {
+                    GetOrCreate((TypeDefinition)x, GlobalContainer.ModifiedNodesBrush);
+                }
+                else 
+                {
+                    //Gets the node type
+                    var typeNode = GetOrCreate(((IMemberDefinition)x).DeclaringType, GlobalContainer.NormalNodesBrush);
+
+                    //Adds to the type node this member
+                    typeNode.Children.Add(new ILEditTreeNode(x, false) { IsExpanded = true, Foreground = GlobalContainer.ModifiedNodesBrush });
+                }
+            }
+
+            //Returns and sorts the contents of the type nodes
+            return typeMapDic.Values;
+        }
 
         #endregion
 

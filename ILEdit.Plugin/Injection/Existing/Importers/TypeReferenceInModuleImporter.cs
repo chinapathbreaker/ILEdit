@@ -27,6 +27,11 @@ namespace ILEdit.Injection.Existing.Importers
             options.CancellationToken.ThrowIfCancellationRequested();
         }
 
+        protected override IEnumerable<IMetadataTokenProvider> GetMembersForPreview()
+        {
+            return new IMetadataTokenProvider[] { };
+        }
+
         protected override IMetadataTokenProvider ImportCore(MemberImportingOptions options)
         {
             //Checks that the task hasn't been canceled

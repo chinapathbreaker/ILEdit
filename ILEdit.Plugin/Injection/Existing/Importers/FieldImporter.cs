@@ -44,7 +44,7 @@ namespace ILEdit.Injection.Existing.Importers
 
             //Checks the attributes of the field
             if (fieldClone.HasCustomAttributes)
-                importList.Add(new CustomAttributesImporter(fieldClone, fieldClone));
+                importList.Add(new CustomAttributesImporter(fieldClone, fieldClone).Scan(options));
         }
 
         protected override IMetadataTokenProvider ImportCore(MemberImportingOptions options)

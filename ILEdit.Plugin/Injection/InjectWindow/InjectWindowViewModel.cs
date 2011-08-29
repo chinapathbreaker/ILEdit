@@ -9,6 +9,7 @@ using System.Windows;
 using Mono.Cecil;
 using System.Threading;
 using System.Threading.Tasks;
+using ICSharpCode.TreeView;
 
 namespace ILEdit.Injection
 {
@@ -118,6 +119,11 @@ namespace ILEdit.Injection
         public IMetadataTokenProvider ExistingSelectedMember { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether to show the preview before performing the actual importing
+        /// </summary>
+        public bool ExistingPreview { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether to import a new type as nested type or not
         /// </summary>
         public bool ExistingImportAsNestedTypes { get; set; }
@@ -130,6 +136,9 @@ namespace ILEdit.Injection
         public RelayCommand InjectCommand { get { return _InjectCommand; } }
         private void InjectCommandImpl()
         {
+            //Flag to determine whther to color the parent nodes
+            var cancel = false;
+
             //Switches on the injection type (new or existing)
             switch (TabSelectedIndex)
             {
@@ -158,21 +167,19 @@ namespace ILEdit.Injection
 
                     //Injects
                     this.SelectedInjector.Inject(_node, this.Name, this.SelectedInjector.NeedsMember ? this.SelectedMember : null);
-                    ICSharpCode.ILSpy.MainWindow.Instance.RefreshDecompiledView();
                     
-                    //Colors the parents of the node
-                    var parent = (ICSharpCode.TreeView.SharpTreeNode)_node;
-                    while (parent != null)
-                    {
-                        parent.Foreground = GlobalContainer.ModifiedNodesBrush;
-                        parent = parent.Parent;
-                    }
-
                     //Break
                     break;
                
                 //Inject existing
                 case 1:
+
+                    //Checks that there's a selection
+                    if (ExistingSelectedMember == null)
+                    {
+                        MessageBox.Show("Select a valid member to import in '" + _node.Text.ToString() + "'", "", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
 
                     //Cancellation token
                     var cts = new CancellationTokenSource();
@@ -183,10 +190,35 @@ namespace ILEdit.Injection
                         
                         //Imports
                         using (var importer = ILEdit.Injection.Existing.MemberImporterFactory.Create(ExistingSelectedMember, _node is ModuleTreeNode ? ((ModuleTreeNode)_node).Module : (IMetadataTokenProvider)((IMemberTreeNode)_node).Member))
-                            importer.Import(new Existing.MemberImportingOptions() {
+                        {
+                            //Options
+                            var options = new Existing.MemberImportingOptions()  {
                                 ImportAsNestedType = ExistingImportAsNestedTypes,
                                 CancellationToken = ct
-                            });
+                            };
+
+                            //Performs scanning
+                            importer.Scan(options);
+
+                            //Checks whether to show the preview
+                            if (ExistingPreview)
+                            {
+
+                                //Builds the preview
+                                var root = new SharpTreeNode();
+                                importer.BuildPreviewNodes(root);
+
+                                //Shows the preview window
+                                Application.Current.Dispatcher.Invoke((Action)(() => {
+                                    cancel = !new Existing.PreviewWindow(root, _node).ShowDialog().GetValueOrDefault(false);
+                                }), null);
+                            }
+
+                            //Performs importing
+                            if (!cancel)
+                                importer.Import(options);
+
+                        }
 
                     }, ct);
                     t.Start();
@@ -213,11 +245,27 @@ namespace ILEdit.Injection
                 
                 //Other: exception
                 default:
-                    throw new ArgumentException("Invlid value: it can be only 0 or 1", "TabSelectedIndex");
+                    throw new ArgumentException("Invalid value: it can be only 0 or 1", "TabSelectedIndex");
             }
 
-            //Closes the window
-            _window.Close();
+            //Colors the parents of the node
+            if (!cancel)
+            {
+                //Colors the ancestors of this node
+                var parent = (ICSharpCode.TreeView.SharpTreeNode)_node;
+                while (parent != null)
+                {
+                    if (parent.Foreground != GlobalContainer.NewNodesBrush)
+                        parent.Foreground = GlobalContainer.ModifiedNodesBrush;
+                    parent = parent.Parent;
+                }
+
+                //Refreshes the view
+                ICSharpCode.ILSpy.MainWindow.Instance.RefreshDecompiledView();
+
+                //Closes the window
+                _window.Close();
+            }
         }
         
         #endregion
