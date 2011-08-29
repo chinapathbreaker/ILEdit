@@ -236,7 +236,7 @@ namespace ILEdit.Injection.Existing
                 if (moduleNode != null)
                 {
                     //Adds the references to the module node
-                    moduleNode.Children.Add(refFolder);
+                    moduleNode.Children.Insert(0, refFolder);
                 }
                 else
                 {

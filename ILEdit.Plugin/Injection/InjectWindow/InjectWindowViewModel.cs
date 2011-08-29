@@ -48,6 +48,11 @@ namespace ILEdit.Injection
 
             //Prepares the commands
             _InjectCommand = new RelayCommand(InjectCommandImpl);
+
+            //Loads from the settings the values of the properties of the 'existing' part
+            var settings = GlobalContainer.InjectionSettings.Element("InjectExistingSettings");
+            ExistingPreview = bool.Parse(settings.Attribute("Preview").Value);
+            ExistingImportAsNestedTypes = bool.Parse(settings.Attribute("ImportAsNestedTypes").Value);
         }
         #endregion
 
@@ -262,6 +267,12 @@ namespace ILEdit.Injection
 
                 //Refreshes the view
                 ICSharpCode.ILSpy.MainWindow.Instance.RefreshDecompiledView();
+
+                //Saves the settings
+                var settings = GlobalContainer.InjectionSettings.Element("InjectExistingSettings");
+                settings.SetAttributeValue("Preview", ExistingPreview);
+                settings.SetAttributeValue("ImportAsNestedTypes", ExistingImportAsNestedTypes);
+                GlobalContainer.SettingsManager.Instance.Save();
 
                 //Closes the window
                 _window.Close();

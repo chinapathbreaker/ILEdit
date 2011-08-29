@@ -117,7 +117,11 @@ namespace ILEdit
                 //Creates <Injection> node
                 Root.Add(new XElement("Injection",
                     new XAttribute("MaxRecentMembersCount", 5),
-                    new XElement("RecentMembers")
+                    new XElement("RecentMembers"),
+                    new XElement("InjectExistingSettings",
+                        new XAttribute("Preview", true),
+                        new XAttribute("ImportAsNestedTypes", false)
+                    )
                 ));
             }
 
