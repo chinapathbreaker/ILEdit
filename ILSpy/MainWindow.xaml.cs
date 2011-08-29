@@ -57,7 +57,10 @@ namespace ICSharpCode.ILSpy
 		
 		[Import]
 		DecompilerTextView decompilerTextView = null;
-		
+
+        [ImportMany("ApplicationLifeCycleInterceptor", typeof(IApplicationLifeCycleInterceptor))]
+        Lazy<IApplicationLifeCycleInterceptor>[] applicationLifeCycleInterceptors = null;
+
 		static MainWindow instance;
 		
 		public static MainWindow Instance {
@@ -309,6 +312,10 @@ namespace ICSharpCode.ILSpy
 					AboutPage.Display(decompilerTextView);
 				}
 			}
+
+            //Fires the OnLoaded notification to the plugins
+            foreach (var x in applicationLifeCycleInterceptors)
+                x.Value.OnLoaded();
 		}
 		
 		#region Update Check
@@ -691,6 +698,13 @@ namespace ICSharpCode.ILSpy
 		
 		protected override void OnClosing(CancelEventArgs e)
 		{
+            //Fires the OnClosing notification to the plugins
+            foreach (var x in applicationLifeCycleInterceptors)
+            {
+                x.Value.OnClosing(e);
+                if (e.Cancel)
+                    return;
+            }
 			base.OnClosing(e);
 			sessionSettings.ActiveAssemblyList = assemblyList.ListName;
 			sessionSettings.ActiveTreeViewPath = GetPathForNode(treeView.SelectedItem as SharpTreeNode);
