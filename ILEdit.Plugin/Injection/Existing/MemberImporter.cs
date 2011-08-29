@@ -24,6 +24,7 @@ namespace ILEdit.Injection.Existing
         /// </summary>
         /// <param name="member">Member to import</param>
         /// <param name="destination">Destination of the importing</param>
+        /// <param name="node">Node where the member will be imported</param>
         public MemberImporter(IMetadataTokenProvider member, IMetadataTokenProvider destination)
         {
             //Checks if the member can be imported (and that member and destination aren't null)
@@ -48,6 +49,7 @@ namespace ILEdit.Injection.Existing
             get { return _member; }
         }
 
+
         private IMetadataTokenProvider _destination;
         /// <summary>
         /// Destination of the importing
@@ -56,6 +58,7 @@ namespace ILEdit.Injection.Existing
         {
             get { return _destination; }
         }
+
 
         /// <summary>
         /// Returns a value indicating whether the scan has been performed
@@ -121,7 +124,7 @@ namespace ILEdit.Injection.Existing
         /// <summary>
         /// Performs the importing
         /// </summary>
-        public void Import(MemberImportingOptions options) 
+        public void Import(MemberImportingOptions options, SharpTreeNode node) 
         {
             //Checks that options isn't null
             if (options == null)
@@ -133,15 +136,15 @@ namespace ILEdit.Injection.Existing
 
             //Imports the members required by this importer
             foreach (var x in _importList)
-                x.Import(options);
+                x.Import(options, node);
             
             //Imports and invokes the event
-            var ret = ImportCore(options);
+            var ret = ImportCore(options, node);
             var evt = ImportFinished;
             if (evt != null)
                 evt(ret);
         }
-        protected abstract IMetadataTokenProvider ImportCore(MemberImportingOptions options);
+        protected abstract IMetadataTokenProvider ImportCore(MemberImportingOptions options, SharpTreeNode node);
 
         #endregion
 

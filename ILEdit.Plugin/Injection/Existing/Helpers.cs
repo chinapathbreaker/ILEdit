@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using Mono.Cecil;
 using ILEdit.Injection.Existing.Importers;
+using ICSharpCode.TreeView;
+using ICSharpCode.ILSpy.TreeNodes;
 
 namespace ILEdit.Injection.Existing
 {
@@ -92,6 +94,37 @@ namespace ILEdit.Injection.Existing
         }
 
         #endregion
+
+        #endregion
+
+        #region SharpTreeNode.AddChildAndColorAncestors extension
+
+        /// <summary>
+        /// Adds a node as child of this node and colors the ancestors
+        /// </summary>
+        /// <param name="node">Destination node</param>
+        /// <param name="child">Node to add</param>
+        public static void AddChildAndColorAncestors(this SharpTreeNode node, SharpTreeNode child)
+        {
+            //Checks that the nodes aren't null
+            if (node == null)
+                throw new ArgumentNullException("node");
+            if (child == null)
+                throw new ArgumentNullException("child");
+
+            //Adds the child
+            node.Children.Add(child);
+
+            //Colors the ancestors
+            var parent = node;
+            while (parent != null)
+            {
+                if (parent.Foreground == GlobalContainer.ModifiedNodesBrush)
+                    break;
+                parent.Foreground = GlobalContainer.ModifiedNodesBrush;
+                parent = parent.Parent;
+            }
+        }
 
         #endregion
 
@@ -206,6 +239,23 @@ namespace ILEdit.Injection.Existing
                 .Where(x => x.Name == ".ctor")
                 .Where(x => x.Parameters.Count == pars.Count())
                 .FirstOrDefault(m => m.Parameters.Select((x, i) => Tuple.Create(x, i)).All(p => p.Item1.ParameterType.Name == pars.ElementAt(p.Item2).Type.Name && p.Item1.ParameterType.Namespace == pars.ElementAt(p.Item2).Type.Namespace));
+        }
+
+        #endregion
+
+        #region FindModuleNode
+
+        /// <summary>
+        /// Finds the node representing the given module
+        /// </summary>
+        /// <param name="module"></param>
+        /// <returns></returns>
+        public static ModuleTreeNode FindModuleNode(ModuleDefinition module)
+        {
+            return
+                ICSharpCode.ILSpy.MainWindow.Instance.RootNode.Children
+                .SelectMany(x => x.Children.Cast<ModuleTreeNode>())
+                .FirstOrDefault(x => x.Module == module);
         }
 
         #endregion

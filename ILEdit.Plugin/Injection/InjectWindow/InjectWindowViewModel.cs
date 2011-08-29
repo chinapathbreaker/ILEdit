@@ -219,9 +219,9 @@ namespace ILEdit.Injection
                                 }), null);
                             }
 
-                            //Performs importing
+                            //Performs importing on the dispatcher thread
                             if (!cancel)
-                                importer.Import(options);
+                                Application.Current.Dispatcher.Invoke((Action)(() => { importer.Import(options, _node); }), null);
 
                         }
 

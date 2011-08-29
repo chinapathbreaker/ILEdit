@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Mono.Cecil;
+using ICSharpCode.TreeView;
 
 namespace ILEdit.Injection.Existing.Importers
 {
@@ -32,7 +33,7 @@ namespace ILEdit.Injection.Existing.Importers
             return new IMetadataTokenProvider[] { };
         }
 
-        protected override IMetadataTokenProvider ImportCore(MemberImportingOptions options)
+        protected override IMetadataTokenProvider ImportCore(MemberImportingOptions options, SharpTreeNode node)
         {
             //Checks that the task hasn't been canceled
             options.CancellationToken.ThrowIfCancellationRequested();

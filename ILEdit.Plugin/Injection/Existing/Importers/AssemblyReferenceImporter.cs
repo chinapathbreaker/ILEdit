@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Mono.Cecil;
+using ICSharpCode.TreeView;
+using ICSharpCode.ILSpy.TreeNodes;
 
 namespace ILEdit.Injection.Existing.Importers
 {
@@ -29,7 +31,7 @@ namespace ILEdit.Injection.Existing.Importers
             return new IMetadataTokenProvider[] { this };
         }
 
-        protected override IMetadataTokenProvider ImportCore(MemberImportingOptions options)
+        protected override IMetadataTokenProvider ImportCore(MemberImportingOptions options, SharpTreeNode node)
         {
             //Checks that the task hasn't been canceled
             options.CancellationToken.ThrowIfCancellationRequested();
@@ -40,7 +42,12 @@ namespace ILEdit.Injection.Existing.Importers
 
             //Adds the reference only if it doesn't already exist
             if (module.AssemblyReferences.Any(x => x.FullName == asm.FullName))
+            {
                 module.AssemblyReferences.Add(asm);
+                Helpers.FindModuleNode(module)
+                    .Children.FirstOrDefault(x => x is ReferenceFolderTreeNode)
+                    .AddChildAndColorAncestors(new ILEditTreeNode(asm, false));
+            }
 
             //Returns null
             return null;

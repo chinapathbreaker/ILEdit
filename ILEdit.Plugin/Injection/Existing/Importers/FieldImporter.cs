@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Mono.Cecil;
+using ICSharpCode.TreeView;
 
 namespace ILEdit.Injection.Existing.Importers
 {
@@ -47,13 +48,14 @@ namespace ILEdit.Injection.Existing.Importers
                 importList.Add(new CustomAttributesImporter(fieldClone, fieldClone).Scan(options));
         }
 
-        protected override IMetadataTokenProvider ImportCore(MemberImportingOptions options)
+        protected override IMetadataTokenProvider ImportCore(MemberImportingOptions options, SharpTreeNode node)
         {
             //Checks that the task hasn't been canceled
             options.CancellationToken.ThrowIfCancellationRequested();
 
             //Adds the field to the destination type
             ((TypeDefinition)Destination).Fields.Add(fieldClone);
+            node.AddChildAndColorAncestors(new ILEditTreeNode(fieldClone, false));
 
             //Returns the new field
             return fieldClone;

@@ -429,6 +429,13 @@ namespace ICSharpCode.ILSpy
 		internal AssemblyListTreeNode AssemblyListTreeNode {
 			get { return assemblyListTreeNode; }
 		}
+
+        /// <summary>
+        /// Returns the root node of the tree
+        /// </summary>
+        public SharpTreeNode RootNode {
+            get { return assemblyListTreeNode; }
+        }
 		
 		#region Node Selection
 		internal void SelectNode(SharpTreeNode obj)

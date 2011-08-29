@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Mono.Cecil;
 using System.Collections.ObjectModel;
+using ICSharpCode.TreeView;
 
 namespace ILEdit.Injection.Existing
 {

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Mono.Cecil;
+using ICSharpCode.TreeView;
+using ICSharpCode.ILSpy.TreeNodes;
 
 namespace ILEdit.Injection.Existing.Importers
 {
@@ -48,7 +50,7 @@ namespace ILEdit.Injection.Existing.Importers
             //TODO: other members
         }
 
-        protected override IMetadataTokenProvider ImportCore(MemberImportingOptions options)
+        protected override IMetadataTokenProvider ImportCore(MemberImportingOptions options, SharpTreeNode node)
         {
             //Checks that the task hasn't been canceled
             options.CancellationToken.ThrowIfCancellationRequested();
@@ -59,12 +61,26 @@ namespace ILEdit.Injection.Existing.Importers
                 //Destination
                 var dest = (ModuleDefinition)Destination;
                 dest.Types.Add(typeClone);
+
+                //Finds the correct namespace
+                var ns = typeClone.Namespace;
+                var moduleNode = Helpers.FindModuleNode((ModuleDefinition)Destination);
+                var nsNode = moduleNode.Children.OfType<NamespaceTreeNode>().FirstOrDefault(x => x.Name == ns);
+                if (nsNode != null)
+                    nsNode.AddChildAndColorAncestors(new ILEditTreeNode(typeClone, false));
+                else
+                {
+                    nsNode = new NamespaceTreeNode(typeClone.Namespace) { Foreground = GlobalContainer.ModifiedNodesBrush };
+                    nsNode.Children.Add(new ILEditTreeNode(typeClone, false));
+                    moduleNode.AddChildAndColorAncestors(nsNode);
+                }
             }
             else
             {
                 //Destination
                 var dest = (TypeDefinition)Destination;
                 dest.NestedTypes.Add(typeClone);
+                node.AddChildAndColorAncestors(new ILEditTreeNode(typeClone, false));
             }
 
             //Return
