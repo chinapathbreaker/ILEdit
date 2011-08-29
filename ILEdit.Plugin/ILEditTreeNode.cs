@@ -310,6 +310,9 @@ namespace ILEdit
                 case TokenType.Module:
                     language.DecompileModule((ModuleDefinition)_tokenProvider, output, options);
                     break;
+                case TokenType.Assembly:
+                    language.WriteCommentLine(output, ((AssemblyNameReference)_tokenProvider).FullName);
+                    break;
                 case TokenType.TypeDef:
                     language.DecompileType((TypeDefinition)_tokenProvider, output, options);
                     break;

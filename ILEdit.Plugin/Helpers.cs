@@ -536,7 +536,8 @@ namespace ILEdit
             {
                 //Queues addition of an assembly reference
                 if (type.Module != destType.Module)
-                    importList.Add(new AssemblyReferenceImporter(type.Module.Assembly.Name, destType.Module).Scan(options));
+                    if (!destType.Module.AssemblyReferences.Any(x => x.FullName == type.Module.Assembly.Name.FullName))
+                        importList.Add(new AssemblyReferenceImporter(type.Module.Assembly.Name, destType.Module).Scan(options));
 
                 //Creates the type importer
                 return new TypeReferenceInModuleImporter(type, destType.Module).Scan(options);

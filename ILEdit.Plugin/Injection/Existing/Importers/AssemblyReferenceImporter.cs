@@ -41,13 +41,10 @@ namespace ILEdit.Injection.Existing.Importers
             var module = ((ModuleDefinition)Destination);
 
             //Adds the reference only if it doesn't already exist
-            if (module.AssemblyReferences.Any(x => x.FullName == asm.FullName))
-            {
-                module.AssemblyReferences.Add(asm);
-                Helpers.Tree.GetModuleNode(module)
-                    .Children.FirstOrDefault(x => x is ReferenceFolderTreeNode)
-                    .AddChildAndColorAncestors(new ILEditTreeNode(asm, false));
-            }
+            module.AssemblyReferences.Add(asm);
+            Helpers.Tree.GetModuleNode(module)
+                .Children.FirstOrDefault(x => x is ReferenceFolderTreeNode)
+                .AddChildAndColorAncestors(new ILEditTreeNode(asm, true));
 
             //Returns null
             return null;
