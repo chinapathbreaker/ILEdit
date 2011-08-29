@@ -7,6 +7,7 @@ using ICSharpCode.ILSpy.TreeNodes;
 using Microsoft.Win32;
 using Mono.Cecil;
 using System.IO;
+using System.Windows.Media;
 
 namespace ILEdit.ContextMenu
 {
@@ -39,7 +40,19 @@ namespace ILEdit.ContextMenu
                 Title = "Save patched assembly"
             };
             if (dialog.ShowDialog().GetValueOrDefault(false))
+            {
+                //Writes the assembly
                 loadedAssembly.AssemblyDefinition.Write(dialog.FileName);
+
+                //Clears the coloring of the nodes
+                foreach (var x in Helpers.PreOrder(selectedNodes[0], x => x.Children))
+                    x.Foreground = GlobalContainer.NormalNodesBrush;
+                var normalColor = ((SolidColorBrush)GlobalContainer.NormalNodesBrush).Color;
+                MainWindow.Instance.RootNode.Foreground =
+                    MainWindow.Instance.RootNode.Children.All(x => x.Foreground is SolidColorBrush && ((SolidColorBrush)x.Foreground).Color == normalColor)
+                    ? GlobalContainer.NormalNodesBrush
+                    : GlobalContainer.ModifiedNodesBrush;
+            }
         }
     }
 }

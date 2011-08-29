@@ -41,7 +41,7 @@ namespace ILEdit.ContextMenu
             if (node is AssemblyReferenceTreeNode)
             {
                 //Walks the tree until it finds the module
-                ModuleTreeNode module = Injection.Injectors.TreeHelper.GetModuleNode(node);
+                ModuleTreeNode module = Helpers.Tree.GetModuleNode(node);
 
                 //Removes the reference from the module
                 module.Module.AssemblyReferences.Remove(((AssemblyReferenceTreeNode)node).Reference);

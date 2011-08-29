@@ -56,14 +56,14 @@ namespace ILEdit.Injection.Injectors
         public void Inject(ICSharpCode.ILSpy.TreeNodes.ILSpyTreeNode node, string name, IMetadataTokenProvider member)
         {
             //Gets the parent module
-            var moduleNode = TreeHelper.GetModuleNode(node);
+            var moduleNode = Helpers.Tree.GetModuleNode(node);
 
             //Injects the assembly reference
             moduleNode.Module.AssemblyReferences.Add(AssemblyNameReference.Parse(name));
 
             //Adds the node
-            node.Children.Add(new AssemblyReferenceTreeNode(AssemblyNameReference.Parse(name), TreeHelper.GetAssemblyNode(moduleNode)) { Foreground = GlobalContainer.NewNodesBrush });
-            TreeHelper.SortChildren((ReferenceFolderTreeNode)node);
+            node.Children.Add(new AssemblyReferenceTreeNode(AssemblyNameReference.Parse(name), Helpers.Tree.GetAssemblyNode(moduleNode)) { Foreground = GlobalContainer.NewNodesBrush });
+            Helpers.Tree.SortChildren((ReferenceFolderTreeNode)node);
         }
     }
 }

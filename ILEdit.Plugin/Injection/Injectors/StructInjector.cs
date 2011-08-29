@@ -81,7 +81,7 @@ namespace ILEdit.Injection.Injectors
             );
 
             //Adds the type
-            TreeHelper.AddTreeNode(node, c,
+            Helpers.Tree.AddTreeNode(node, c,
                 module => { c.BaseType = module.Import(new TypeReference("System", "ValueType", module, module.TypeSystem.Corlib, true)); },
                 type => { c.BaseType = type.Module.Import(new TypeReference("System", "ValueType", type.Module, type.Module.TypeSystem.Corlib, true)); }
             );

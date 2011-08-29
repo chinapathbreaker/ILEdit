@@ -47,6 +47,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApplicationLifeCycle.cs" />
     <Compile Include="ContextMenu\InjectExistingEntry.cs" />
     <Compile Include="ContextMenu\InjectNewEntry.cs" />
     <Compile Include="ContextMenu\RemoveEntry.cs" />
@@ -54,11 +55,11 @@
     <Compile Include="ContextMenu\SaveEntry.cs" />
     <Compile Include="Converters\AllTrueMultiConverter.cs" />
     <Compile Include="GlobalContainer.cs" />
+    <Compile Include="Helpers.cs" />
     <Compile Include="ILEditTreeNode.cs" />
     <Compile Include="Injection\Existing\Importers\AssemblyReferenceImporter.cs" />
     <Compile Include="Injection\Existing\Importers\CustomAttributesImporter.cs" />
     <Compile Include="Injection\Existing\Importers\FieldImporter.cs" />
-    <Compile Include="Injection\Existing\Helpers.cs" />
     <Compile Include="Injection\Existing\MemberImporter.cs" />
     <Compile Include="Injection\Existing\MemberImporterFactory.cs" />
     <Compile Include="Injection\Existing\MemberImportingOptions.cs" />
@@ -78,7 +79,6 @@
     <Compile Include="Injection\Injectors\MethodInjector.cs" />
     <Compile Include="Injection\Injectors\PropertyInjector.cs" />
     <Compile Include="Injection\Injectors\StructInjector.cs" />
-    <Compile Include="Injection\Injectors\TreeHelper.cs" />
     <Compile Include="Injection\InjectWindow\InjectWindow.xaml.cs">
       <DependentUpon>InjectWindow.xaml</DependentUpon>
     </Compile>

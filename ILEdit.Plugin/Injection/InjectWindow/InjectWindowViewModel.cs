@@ -33,11 +33,11 @@ namespace ILEdit.Injection
             InjectInContent = node.Text;
 
             //Finds the module
-            var moduleNode = ILEdit.Injection.Injectors.TreeHelper.GetModuleNode(node);
+            var moduleNode = Helpers.Tree.GetModuleNode(node);
             DestinationModule = moduleNode == null ? null : moduleNode.Module;
 
             //Finds the enclosing type (if any)
-            EnclosingType = Injection.Injectors.TreeHelper.GetType(node);
+            EnclosingType = Helpers.Tree.GetType(node);
 
             //Prepares the filters for the inject existing part
             if (canInjectExisting)

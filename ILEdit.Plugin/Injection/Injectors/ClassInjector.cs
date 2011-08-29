@@ -85,7 +85,7 @@ namespace ILEdit.Injection.Injectors
             );
 
             //Adds to the node
-            TreeHelper.AddTreeNode(node, c, null, null);
+            Helpers.Tree.AddTreeNode(node, c, null, null);
         }
     }
 }

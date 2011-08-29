@@ -182,7 +182,7 @@ namespace ILEdit
                 var term = ((Tuple<SharpTreeNode[], string>)param).Item2.ToLower();
 
                 //Searchs the term
-                foreach (var node in PreOrder(nodes, x => { x.EnsureLazyChildren(); return x.Children; }))
+                foreach (var node in Helpers.PreOrder(nodes, x => { x.EnsureLazyChildren(); return x.Children; }))
                 {
                     ct.ThrowIfCancellationRequested();
                     if (node.Text != null && node.Text.ToString().ToLower().StartsWith(term))
@@ -220,43 +220,6 @@ namespace ILEdit
                 TxtSearch.IsEnabled = true;
 
             })); });
-        }
-
-        //Taken from ICSharpCode.NRefactory.Utils.TreeTraversal
-        /// <summary>
-        /// Converts a tree data structure into a flat list by traversing it in pre-order.
-        /// </summary>
-        /// <param name="input">The root elements of the forest.</param>
-        /// <param name="recursion">The function that gets the children of an element.</param>
-        /// <returns>Iterator that enumerates the tree structure in pre-order.</returns>
-        private static IEnumerable<T> PreOrder<T>(IEnumerable<T> input, Func<T, IEnumerable<T>> recursion)
-        {
-            Stack<IEnumerator<T>> stack = new Stack<IEnumerator<T>>();
-            try
-            {
-                stack.Push(input.GetEnumerator());
-                while (stack.Count > 0)
-                {
-                    while (stack.Peek().MoveNext())
-                    {
-                        T element = stack.Peek().Current;
-                        yield return element;
-                        IEnumerable<T> children = recursion(element);
-                        if (children != null)
-                        {
-                            stack.Push(children.GetEnumerator());
-                        }
-                    }
-                    stack.Pop().Dispose();
-                }
-            }
-            finally
-            {
-                while (stack.Count > 0)
-                {
-                    stack.Pop().Dispose();
-                }
-            }
         }
 
         private void BtnOk_Click(object sender, RoutedEventArgs e)

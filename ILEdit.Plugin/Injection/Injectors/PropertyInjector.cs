@@ -161,7 +161,7 @@ namespace ILEdit.Injection.Injectors
                 if (!type.IsInterface)
                     node.Children.Add(new ILEditTreeNode(backingField, true));
                 node.Children.Add(new ILEditTreeNode(prop, false));
-                TreeHelper.SortChildren((TypeTreeNode)node);
+                Helpers.Tree.SortChildren((TypeTreeNode)node);
             }
             else if (node is ILEditTreeNode)
             {

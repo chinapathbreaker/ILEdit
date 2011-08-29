@@ -87,7 +87,7 @@ namespace ILEdit.Injection.Injectors
             ModuleDefinition module = null;
 
             //Adds the type
-            TreeHelper.AddTreeNode(node, c,
+            Helpers.Tree.AddTreeNode(node, c,
                 m => { module = m; c.BaseType = m.Import(new TypeReference("System", "MulticastDelegate", m, m.TypeSystem.Corlib)); },
                 type => { module = type.Module; c.BaseType = type.Module.Import(new TypeReference("System", "MulticastDelegate", type.Module, type.Module.TypeSystem.Corlib)); }
             );

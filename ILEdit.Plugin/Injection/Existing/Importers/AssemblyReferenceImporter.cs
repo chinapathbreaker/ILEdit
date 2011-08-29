@@ -44,7 +44,7 @@ namespace ILEdit.Injection.Existing.Importers
             if (module.AssemblyReferences.Any(x => x.FullName == asm.FullName))
             {
                 module.AssemblyReferences.Add(asm);
-                Helpers.FindModuleNode(module)
+                Helpers.Tree.GetModuleNode(module)
                     .Children.FirstOrDefault(x => x is ReferenceFolderTreeNode)
                     .AddChildAndColorAncestors(new ILEditTreeNode(asm, false));
             }

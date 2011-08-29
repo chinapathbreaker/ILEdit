@@ -84,7 +84,7 @@ namespace ILEdit.Injection.Injectors
             if (node is TypeTreeNode)
             {
                 node.Children.Add(new ILEditTreeNode(method, false));
-                TreeHelper.SortChildren((TypeTreeNode)node);
+                Helpers.Tree.SortChildren((TypeTreeNode)node);
             }
             else if (node is ILEditTreeNode)
             {

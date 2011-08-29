@@ -64,7 +64,7 @@ namespace ILEdit.Injection.Existing.Importers
 
                 //Finds the correct namespace
                 var ns = typeClone.Namespace;
-                var moduleNode = Helpers.FindModuleNode((ModuleDefinition)Destination);
+                var moduleNode = Helpers.Tree.GetModuleNode((ModuleDefinition)Destination);
                 var nsNode = moduleNode.Children.OfType<NamespaceTreeNode>().FirstOrDefault(x => x.Name == ns);
                 if (nsNode != null)
                     nsNode.AddChildAndColorAncestors(new ILEditTreeNode(typeClone, false));

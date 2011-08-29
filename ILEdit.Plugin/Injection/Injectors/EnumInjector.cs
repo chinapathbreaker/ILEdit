@@ -91,7 +91,7 @@ namespace ILEdit.Injection.Injectors
             ModuleDefinition module = null;
 
             //Adds to the node and specifies the base class
-            TreeHelper.AddTreeNode(node, c,
+            Helpers.Tree.AddTreeNode(node, c,
                 m => { module = m; c.BaseType = new TypeReference("System", "Enum", m, m.TypeSystem.Corlib, true); },
                 t => { module = t.Module; c.BaseType = new TypeReference("System", "Enum", t.Module, t.Module.TypeSystem.Corlib, true); }
             );
