@@ -30,14 +30,60 @@ namespace ILEdit.Injection.Existing.Importers
             //Clones the type
             typeClone = ((TypeDefinition)Member).Clone();
 
+            //Adjusts the visibility of the type
+            if (Destination.MetadataToken.TokenType == TokenType.Module)
+            {
+                //Makes sure that the type isn't marked as nested
+                var visibility = typeClone.Attributes & TypeAttributes.VisibilityMask;
+                typeClone.Attributes &= ~TypeAttributes.VisibilityMask;
+                switch (visibility)
+                {
+                    case TypeAttributes.Public:
+                    case TypeAttributes.NestedPublic:
+                        typeClone.Attributes |= TypeAttributes.Public;
+                        break;
+                    case TypeAttributes.NotPublic:
+                    case TypeAttributes.NestedPrivate:
+                    case TypeAttributes.NestedFamily:
+                    case TypeAttributes.NestedAssembly:
+                    case TypeAttributes.NestedFamANDAssem:
+                    case TypeAttributes.NestedFamORAssem:
+                        typeClone.Attributes |= TypeAttributes.NotPublic;
+                        break;
+                }
+            }
+            else
+            {
+                //Makes sure that the type is marked as nested
+                if (typeClone.IsPublic)
+                {
+                    typeClone.Attributes = typeClone.Attributes & ~TypeAttributes.VisibilityMask | TypeAttributes.NestedPublic;
+                }
+                else if (typeClone.IsNotPublic)
+                {
+                    typeClone.Attributes = typeClone.Attributes & ~TypeAttributes.VisibilityMask | TypeAttributes.NestedAssembly;
+                }
+            }
+
             //Registers the importing of the custom attributes of this class
             if (typeClone.HasCustomAttributes)
             {
                 importList.Add(new CustomAttributesImporter(typeClone, typeClone).Scan(options));
                 typeClone.CustomAttributes.Clear();
             }
+            
+            //Throws if cancellation was requested
+            options.CancellationToken.ThrowIfCancellationRequested();
 
-            //TODO: Generic parameters and constraints
+            //Registers importing of generic parameters constraints
+            if (typeClone.HasGenericParameters)
+            {
+                importList.Add(new GenericParametersImporter(typeClone, typeClone).Scan(options));
+                typeClone.GenericParameters.Clear();
+            }
+
+            //Throws if cancellation was requested
+            options.CancellationToken.ThrowIfCancellationRequested();
 
             //Registers the importing of the fields
             foreach (var f in typeClone.Fields)

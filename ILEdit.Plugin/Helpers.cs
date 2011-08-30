@@ -359,7 +359,7 @@ namespace ILEdit
                 Constant = field.Constant,
                 MarshalInfo = field.MarshalInfo,
                 HasDefault = field.HasDefault,
-                MetadataToken = field.MetadataToken
+                MetadataToken = new MetadataToken(field.MetadataToken.TokenType, GlobalContainer.GetFreeRID(field.Module))
             };
             foreach (var x in field.CustomAttributes)
                 f.CustomAttributes.Add(x);
@@ -377,10 +377,7 @@ namespace ILEdit
         /// <returns></returns>
         public static CustomAttribute Clone(this CustomAttribute attr)
         {
-            var a = new CustomAttribute(attr.Constructor)
-            {
-
-            };
+            var a = new CustomAttribute(attr.Constructor);
             foreach (var x in attr.ConstructorArguments)
                 a.ConstructorArguments.Add(x);
             foreach (var x in attr.Fields)
@@ -406,7 +403,7 @@ namespace ILEdit
                 PackingSize = type.PackingSize,
                 ClassSize = type.ClassSize,
                 HasSecurity = type.HasSecurity,
-                MetadataToken = type.MetadataToken
+                MetadataToken = new MetadataToken(type.MetadataToken.TokenType, GlobalContainer.GetFreeRID(type.Module))
             };
             foreach (var x in type.Interfaces)
                 t.Interfaces.Add(x);
@@ -417,6 +414,33 @@ namespace ILEdit
             foreach (var x in type.GenericParameters)
                 t.GenericParameters.Add(x);
             return t;
+        }
+
+        #endregion
+
+        #region GenericParameter.Clone() extension
+
+        /// <summary>
+        /// Clones this generic parameter
+        /// </summary>
+        /// <param name="field"></param>
+        /// <returns></returns>
+        public static GenericParameter Clone(this GenericParameter param)
+        {
+            var p = new GenericParameter(param.Name, param.Owner)
+            {
+                Attributes = param.Attributes,
+                DeclaringType = param.DeclaringType,
+                HasDefaultConstructorConstraint = param.HasDefaultConstructorConstraint,
+                MetadataToken = new MetadataToken(param.MetadataToken.TokenType, GlobalContainer.GetFreeRID(param.Module))
+            };
+            foreach (var x in param.Constraints)
+                p.Constraints.Add(x);
+            foreach (var x in param.CustomAttributes)
+                p.CustomAttributes.Add(x);
+            foreach (var x in param.GenericParameters)
+                p.GenericParameters.Add(x);
+            return p;
         }
 
         #endregion
@@ -488,7 +512,7 @@ namespace ILEdit
                 return true;
 
             //Checks if the type is public or nested public
-            if ((type.Attributes & (TypeAttributes.Public | TypeAttributes.NestedPublic)) != 0)
+            if (type.IsPublic || type.IsNestedPublic)
                 return true;
 
             //Checks if the types are nested
@@ -530,8 +554,20 @@ namespace ILEdit
         /// <param name="importList"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        public static MemberImporter CreateTypeImporter(TypeDefinition type, TypeDefinition destType, List<MemberImporter> importList, MemberImportingOptions options)
+        public static MemberImporter CreateTypeImporter(TypeReference type, TypeDefinition destType, List<MemberImporter> importList, MemberImportingOptions options)
         {
+            //Checks if the type is a generic instance type
+            if (type is GenericInstanceType)
+                return Helpers.CreateTypeImporterForGenericType((GenericInstanceType)type, destType, importList, options);
+            else if (type is TypeReference)
+                return Helpers.CreateTypeImporterForTypeDefinition(((TypeReference)type).Resolve(), destType, importList, options);
+            else
+                return null;
+        }
+
+        private static MemberImporter CreateTypeImporterForTypeDefinition(TypeDefinition type, TypeDefinition destType, List<MemberImporter> importList, MemberImportingOptions options)
+        {
+            //Checks if the type is accessible
             if (Helpers.IsTypeAccessibleFrom(type, destType))
             {
                 //Queues addition of an assembly reference
@@ -547,6 +583,12 @@ namespace ILEdit
                 //Creates the type importer
                 return new TypeImporter(type, options.ImportAsNestedType ? (IMetadataTokenProvider)destType : (IMetadataTokenProvider)destType.Module).Scan(options);
             }
+        }
+
+        private static MemberImporter CreateTypeImporterForGenericType(GenericInstanceType type, TypeDefinition destType, List<MemberImporter> importList, MemberImportingOptions options)
+        {
+            //Returns the generic instance type importer
+            return new GenericInstanceTypeImporter(type, destType).Scan(options);
         }
 
         #endregion

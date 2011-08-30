@@ -17,6 +17,50 @@ namespace ILEdit.Injection.Existing
     {
         private List<MemberImporter> _importList = null;
 
+        #region Create() static method
+
+        private class LambdaImporter : MemberImporter
+        {
+            private Func<MemberImportingOptions, SharpTreeNode, IMetadataTokenProvider> _importFunc;
+
+            public LambdaImporter(Func<MemberImportingOptions, SharpTreeNode, IMetadataTokenProvider> importFunc)
+                : base(null, null)
+            {
+                _importFunc = importFunc;
+            }
+            protected override bool CanImportCore(IMetadataTokenProvider member, IMetadataTokenProvider destination)
+            {
+                return true;
+            }
+            protected override void ScanCore(MemberImportingOptions options, List<MemberImporter> importList)
+            {
+            }
+            protected override IMetadataTokenProvider ImportCore(MemberImportingOptions options, SharpTreeNode node)
+            {
+                return _importFunc(options, node);
+            }
+            protected override IEnumerable<IMetadataTokenProvider> GetMembersForPreview()
+            {
+                return new IMetadataTokenProvider[] { };
+            }
+            protected override void DisposeCore()
+            {
+                _importFunc = null;
+            }
+        }
+
+        /// <summary>
+        /// Creates a fast member importer, with the given functinon
+        /// </summary>
+        /// <param name="importFunc"></param>
+        /// <returns></returns>
+        public static MemberImporter Create(Func<MemberImportingOptions, SharpTreeNode, IMetadataTokenProvider> importFunc)
+        {
+            return new LambdaImporter(importFunc);
+        }
+
+        #endregion
+
         #region .ctor
 
         /// <summary>
@@ -81,10 +125,13 @@ namespace ILEdit.Injection.Existing
         public bool CanImport(IMetadataTokenProvider member, IMetadataTokenProvider destination) 
         {
             //Checks that the parameters aren't null;
-            if (member == null)
-                throw new ArgumentNullException("member");
-            if (destination == null)
-                throw new ArgumentNullException("destination");
+            if (member == null ^ destination == null)
+            {
+                if (member == null)
+                    throw new ArgumentNullException("member");
+                if (destination == null)
+                    throw new ArgumentNullException("destination");
+            }
 
             //Calls the protected method
             return CanImportCore(member, destination);
@@ -300,7 +347,16 @@ namespace ILEdit.Injection.Existing
                 //Checks if this member is a type or not
                 if (x is TypeDefinition)
                 {
-                    GetOrCreate((TypeDefinition)x, GlobalContainer.ModifiedNodesBrush);
+                    var type = (TypeDefinition)x;
+                    if (type.IsNested)
+                    {
+                        GetOrCreate(type.DeclaringType, GlobalContainer.NormalNodesBrush)
+                            .Children.Add(new ILEditTreeNode(type, true) { IsExpanded = true, Foreground = GlobalContainer.ModifiedNodesBrush });
+                    }
+                    else
+                    {
+                        GetOrCreate(type, GlobalContainer.ModifiedNodesBrush);
+                    }
                 }
                 else 
                 {

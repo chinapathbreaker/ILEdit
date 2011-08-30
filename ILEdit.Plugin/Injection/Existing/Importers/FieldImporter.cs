@@ -33,7 +33,7 @@ namespace ILEdit.Injection.Existing.Importers
             fieldClone = ((FieldDefinition)Member).Clone();
 
             //Field type
-            var fieldType = fieldClone.FieldType.Resolve();
+            var fieldType = fieldClone.FieldType;
 
             //Destination type
             var destType = (TypeDefinition)Destination;
