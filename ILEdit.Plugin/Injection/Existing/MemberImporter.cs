@@ -24,7 +24,7 @@ namespace ILEdit.Injection.Existing
             private Func<MemberImportingOptions, SharpTreeNode, IMetadataTokenProvider> _importFunc;
 
             public LambdaImporter(Func<MemberImportingOptions, SharpTreeNode, IMetadataTokenProvider> importFunc)
-                : base(null, null)
+                : base(null, null, null)
             {
                 _importFunc = importFunc;
             }
@@ -69,7 +69,7 @@ namespace ILEdit.Injection.Existing
         /// <param name="member">Member to import</param>
         /// <param name="destination">Destination of the importing</param>
         /// <param name="node">Node where the member will be imported</param>
-        public MemberImporter(IMetadataTokenProvider member, IMetadataTokenProvider destination)
+        public MemberImporter(IMetadataTokenProvider member, IMetadataTokenProvider destination, ModuleDefinition destModule)
         {
             //Checks if the member can be imported (and that member and destination aren't null)
             if (!CanImport(member, destination))
@@ -78,11 +78,12 @@ namespace ILEdit.Injection.Existing
             //Stores member and destination
             _member = member;
             _destination = destination;
+            _DestinationModule = destModule;
         }
 
         #endregion
 
-        #region Properties Member, Destination and Scanned
+        #region Properties Member, Destination, DestinationModule and Scanned
 
         private IMetadataTokenProvider _member;
         /// <summary>
@@ -102,6 +103,13 @@ namespace ILEdit.Injection.Existing
         {
             get { return _destination; }
         }
+
+
+        private ModuleDefinition _DestinationModule;
+        /// <summary>
+        /// Module destination of the importing
+        /// </summary>
+        public ModuleDefinition DestinationModule { get { return _DestinationModule; } }
 
 
         /// <summary>

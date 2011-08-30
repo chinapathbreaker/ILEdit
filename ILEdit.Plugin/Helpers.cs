@@ -554,41 +554,39 @@ namespace ILEdit
         /// <param name="importList"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        public static MemberImporter CreateTypeImporter(TypeReference type, TypeDefinition destType, List<MemberImporter> importList, MemberImportingOptions options)
+        public static MemberImporter CreateTypeImporter(TypeReference type, TypeDefinition destType, ModuleDefinition destModule, List<MemberImporter> importList, MemberImportingOptions options)
         {
             //Checks if the type is a generic instance type
             if (type is GenericInstanceType)
-                return Helpers.CreateTypeImporterForGenericType((GenericInstanceType)type, destType, importList, options);
-            else if (type is TypeReference)
-                return Helpers.CreateTypeImporterForTypeDefinition(((TypeReference)type).Resolve(), destType, importList, options);
+                return Helpers.CreateTypeImporterForGenericType((GenericInstanceType)type, destType, destModule, importList, options);
             else
-                return null;
+                return Helpers.CreateTypeImporterForTypeDefinition(((TypeReference)type).Resolve(), destType, destModule, importList, options);
         }
 
-        private static MemberImporter CreateTypeImporterForTypeDefinition(TypeDefinition type, TypeDefinition destType, List<MemberImporter> importList, MemberImportingOptions options)
+        private static MemberImporter CreateTypeImporterForTypeDefinition(TypeDefinition type, TypeDefinition destType, ModuleDefinition destModule, List<MemberImporter> importList, MemberImportingOptions options)
         {
             //Checks if the type is accessible
             if (Helpers.IsTypeAccessibleFrom(type, destType))
             {
                 //Queues addition of an assembly reference
-                if (type.Module != destType.Module)
-                    if (!destType.Module.AssemblyReferences.Any(x => x.FullName == type.Module.Assembly.Name.FullName))
-                        importList.Add(new AssemblyReferenceImporter(type.Module.Assembly.Name, destType.Module).Scan(options));
+                if (type.Module != destModule)
+                    if (!destModule.AssemblyReferences.Any(x => x.FullName == type.Module.Assembly.Name.FullName))
+                        importList.Add(new AssemblyReferenceImporter(type.Module.Assembly.Name, destModule, destModule).Scan(options));
 
                 //Creates the type importer
-                return new TypeReferenceInModuleImporter(type, destType.Module).Scan(options);
+                return new TypeReferenceInModuleImporter(type, destModule, destModule).Scan(options);
             }
             else
             {
                 //Creates the type importer
-                return new TypeImporter(type, options.ImportAsNestedType ? (IMetadataTokenProvider)destType : (IMetadataTokenProvider)destType.Module).Scan(options);
+                return new TypeImporter(type, options.ImportAsNestedType ? (IMetadataTokenProvider)destType : (IMetadataTokenProvider)destModule, destModule).Scan(options);
             }
         }
 
-        private static MemberImporter CreateTypeImporterForGenericType(GenericInstanceType type, TypeDefinition destType, List<MemberImporter> importList, MemberImportingOptions options)
+        private static MemberImporter CreateTypeImporterForGenericType(GenericInstanceType type, TypeDefinition destType, ModuleDefinition destModule, List<MemberImporter> importList, MemberImportingOptions options)
         {
             //Returns the generic instance type importer
-            return new GenericInstanceTypeImporter(type, destType).Scan(options);
+            return new GenericInstanceTypeImporter(type, destType, destModule).Scan(options);
         }
 
         #endregion

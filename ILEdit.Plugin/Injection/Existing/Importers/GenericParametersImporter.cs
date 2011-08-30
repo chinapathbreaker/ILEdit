@@ -10,8 +10,8 @@ namespace ILEdit.Injection.Existing.Importers
     {
         GenericParameter[] parametersClone;
 
-        public GenericParametersImporter(IMetadataTokenProvider member, IMetadataTokenProvider destination)
-            : base(member, destination)
+        public GenericParametersImporter(IMetadataTokenProvider member, IMetadataTokenProvider destination, ModuleDefinition destModule)
+            : base(member, destination, destModule)
         {
         }
 
@@ -38,14 +38,14 @@ namespace ILEdit.Injection.Existing.Importers
                 var param = p;
                 if (param.HasCustomAttributes)
                 {
-                    importList.Add(new CustomAttributesImporter(p, p).Scan(options));
+                    importList.Add(new CustomAttributesImporter(p, p, DestinationModule).Scan(options));
                     param.CustomAttributes.Clear();
                 }
 
                 //For each constraint creates registers a type importer
                 foreach (var c in param.Constraints.Where(x => !(x is GenericParameter)))
                 {
-                    var importer = Helpers.CreateTypeImporter(c, destType, importList, options);
+                    var importer = Helpers.CreateTypeImporter(c, destType, DestinationModule, importList, options);
                     importer.ImportFinished += (constraint) => param.Constraints.Add((TypeReference)constraint);
                     importList.Add(importer);
                 }

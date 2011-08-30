@@ -19,13 +19,13 @@ namespace ILEdit.Injection.Existing
         /// <param name="member">Member to import</param>
         /// <param name="destination">Destination of the importing</param>
         /// <returns></returns>
-        public static MemberImporter Create(IMetadataTokenProvider member, IMetadataTokenProvider destination)
+        public static MemberImporter Create(IMetadataTokenProvider member, IMetadataTokenProvider destination, ModuleDefinition destModule)
         {
             //Switches on the token type of the member
             switch (member.MetadataToken.TokenType)
             {
                 case TokenType.Field:
-                    return new Importers.FieldImporter(member, destination);
+                    return new Importers.FieldImporter(member, destination, destModule);
                 case TokenType.TypeDef:
                 case TokenType.Method:
                 case TokenType.Event:

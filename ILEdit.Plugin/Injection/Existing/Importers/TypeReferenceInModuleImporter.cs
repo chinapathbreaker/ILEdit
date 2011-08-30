@@ -12,8 +12,8 @@ namespace ILEdit.Injection.Existing.Importers
     /// </summary>
     internal class TypeReferenceInModuleImporter : MemberImporter
     {
-        public TypeReferenceInModuleImporter(IMetadataTokenProvider member, IMetadataTokenProvider destination)
-            : base(member, destination)
+        public TypeReferenceInModuleImporter(IMetadataTokenProvider member, IMetadataTokenProvider destination, ModuleDefinition destModule)
+            : base(member, destination, destModule)
         {
         }
 

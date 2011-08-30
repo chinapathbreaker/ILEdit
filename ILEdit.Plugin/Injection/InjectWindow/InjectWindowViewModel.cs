@@ -194,7 +194,11 @@ namespace ILEdit.Injection
                     var t = new Task(() => {
                         
                         //Imports
-                        using (var importer = ILEdit.Injection.Existing.MemberImporterFactory.Create(ExistingSelectedMember, _node is ModuleTreeNode ? ((ModuleTreeNode)_node).Module : (IMetadataTokenProvider)((IMemberTreeNode)_node).Member))
+                        using (var importer = 
+                               ILEdit.Injection.Existing.MemberImporterFactory.Create(
+                                   ExistingSelectedMember, 
+                                   _node is ModuleTreeNode ? ((ModuleTreeNode)_node).Module : (IMetadataTokenProvider)((IMemberTreeNode)_node).Member,
+                                   _node is ModuleTreeNode ? ((ModuleTreeNode)_node).Module : ((IMemberTreeNode)_node).Member.Module))
                         {
                             //Options
                             var options = new Existing.MemberImportingOptions()  {

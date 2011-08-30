@@ -13,10 +13,17 @@ namespace ILEdit.Injection.Existing.Importers
     public class FieldImporter : MemberImporter
     {
         private FieldDefinition fieldClone;
-        
-        public FieldImporter(IMetadataTokenProvider member, IMetadataTokenProvider destination)
-            : base(member, destination)
+        private bool _createNode;
+
+        public FieldImporter(IMetadataTokenProvider member, IMetadataTokenProvider destination, ModuleDefinition destModule)
+            : this(member, destination, destModule, true)
         {
+        }
+
+        public FieldImporter(IMetadataTokenProvider member, IMetadataTokenProvider destination, ModuleDefinition destModule, bool createNode)
+            : base(member, destination, destModule)
+        {
+            _createNode = createNode;
         }
 
         protected override bool CanImportCore(IMetadataTokenProvider member, IMetadataTokenProvider destination)
@@ -39,13 +46,18 @@ namespace ILEdit.Injection.Existing.Importers
             var destType = (TypeDefinition)Destination;
 
             //Imports the type
-            var typeImporter = Helpers.CreateTypeImporter(fieldType, destType, importList, options);
+            var typeImporter = Helpers.CreateTypeImporter(fieldType, destType, DestinationModule, importList, options);
             importList.Add(typeImporter);
             typeImporter.ImportFinished += (typeRef) => fieldClone.FieldType = (TypeReference)typeRef;
 
             //Checks the attributes of the field
             if (fieldClone.HasCustomAttributes)
-                importList.Add(new CustomAttributesImporter(fieldClone, fieldClone).Scan(options));
+                importList.Add(new CustomAttributesImporter(fieldClone, fieldClone, DestinationModule).Scan(options));
+        }
+
+        protected override IEnumerable<IMetadataTokenProvider> GetMembersForPreview()
+        {
+            return _createNode ? base.GetMembersForPreview() : base.GetMembersForPreview().Except(new[] { Member });
         }
 
         protected override IMetadataTokenProvider ImportCore(MemberImportingOptions options, SharpTreeNode node)
@@ -55,7 +67,8 @@ namespace ILEdit.Injection.Existing.Importers
 
             //Adds the field to the destination type
             ((TypeDefinition)Destination).Fields.Add(fieldClone);
-            node.AddChildAndColorAncestors(new ILEditTreeNode(fieldClone, false));
+            if (_createNode)
+                node.AddChildAndColorAncestors(new ILEditTreeNode(fieldClone, false));
 
             //Returns the new field
             return fieldClone;

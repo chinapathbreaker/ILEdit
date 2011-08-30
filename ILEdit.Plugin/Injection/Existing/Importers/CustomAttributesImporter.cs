@@ -14,8 +14,8 @@ namespace ILEdit.Injection.Existing.Importers
     {
         private CustomAttribute[] attribs;
 
-        public CustomAttributesImporter(IMetadataTokenProvider member, IMetadataTokenProvider destination)
-            : base(member, destination)
+        public CustomAttributesImporter(IMetadataTokenProvider member, IMetadataTokenProvider destination, ModuleDefinition destModule)
+            : base(member, destination, destModule)
         {
         }
 
@@ -43,7 +43,7 @@ namespace ILEdit.Injection.Existing.Importers
 
                 var a = x;
                 //Imports the type of the attribute
-                var typeImporter = Helpers.CreateTypeImporter(a.AttributeType.Resolve(), destType, importList, options);
+                var typeImporter = Helpers.CreateTypeImporter(a.AttributeType.Resolve(), destType, DestinationModule, importList, options);
                 importList.Add(typeImporter);
                 typeImporter.ImportFinished += (typeRef) => a.Constructor = Helpers.GetConstructorMatchingArguments(((TypeReference)typeRef).Resolve(), a.ConstructorArguments);
 
@@ -52,7 +52,7 @@ namespace ILEdit.Injection.Existing.Importers
                 {
                     var p = a.ConstructorArguments[i];
                     //Imports the type of the argument
-                    var argumentTypeImporter = Helpers.CreateTypeImporter(p.Type.Resolve(), destType, importList, options);
+                    var argumentTypeImporter = Helpers.CreateTypeImporter(p.Type.Resolve(), destType, DestinationModule, importList, options);
                     importList.Add(argumentTypeImporter);
                     var index = i;
                     argumentTypeImporter.ImportFinished += (typeRef) => {

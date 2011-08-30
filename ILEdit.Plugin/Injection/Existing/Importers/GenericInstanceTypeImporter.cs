@@ -10,8 +10,8 @@ namespace ILEdit.Injection.Existing.Importers
     {
         GenericInstanceType retType;
 
-        public GenericInstanceTypeImporter(IMetadataTokenProvider member, IMetadataTokenProvider destination)
-            : base(member, destination)
+        public GenericInstanceTypeImporter(IMetadataTokenProvider member, IMetadataTokenProvider destination, ModuleDefinition destModule)
+            : base(member, destination, destModule)
         {
         }
 
@@ -28,7 +28,7 @@ namespace ILEdit.Injection.Existing.Importers
 
             //Element type
             var elType = type.ElementType.Resolve();
-            var elTypeImporter = Helpers.CreateTypeImporter(elType, destType, importList, options);
+            var elTypeImporter = Helpers.CreateTypeImporter(elType, destType, DestinationModule, importList, options);
             elTypeImporter.ImportFinished += t => retType = new GenericInstanceType((TypeReference)t);
             importList.Add(elTypeImporter);
 
@@ -45,7 +45,7 @@ namespace ILEdit.Injection.Existing.Importers
                 }
                 else
                 {
-                    var argImporter = Helpers.CreateTypeImporter(a, destType, importList, options);
+                    var argImporter = Helpers.CreateTypeImporter(a, destType, DestinationModule, importList, options);
                     argImporter.ImportFinished += x => retType.GenericArguments.Add((TypeReference)x);
                     importList.Add(argImporter);
                 }
