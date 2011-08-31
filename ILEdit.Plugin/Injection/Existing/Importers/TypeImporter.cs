@@ -12,8 +12,8 @@ namespace ILEdit.Injection.Existing.Importers
     {
         private TypeDefinition typeClone;
 
-        public TypeImporter(IMetadataTokenProvider member, IMetadataTokenProvider destination, ModuleDefinition destModule)
-            : base(member, destination, destModule)
+        public TypeImporter(IMetadataTokenProvider member, IMetadataTokenProvider destination, MemberImportingSession session)
+            : base(member, destination, session)
         {
         }
 
@@ -68,7 +68,7 @@ namespace ILEdit.Injection.Existing.Importers
             //Registers the importing of the custom attributes of this class
             if (typeClone.HasCustomAttributes)
             {
-                importList.Add(new CustomAttributesImporter(typeClone, typeClone, DestinationModule).Scan(options));
+                importList.Add(new CustomAttributesImporter(typeClone, typeClone, Session).Scan(options));
                 typeClone.CustomAttributes.Clear();
             }
             
@@ -78,7 +78,7 @@ namespace ILEdit.Injection.Existing.Importers
             //Registers importing of generic parameters constraints
             if (typeClone.HasGenericParameters)
             {
-                importList.Add(new GenericParametersImporter(typeClone, typeClone, DestinationModule).Scan(options));
+                importList.Add(new GenericParametersImporter(typeClone, typeClone, Session).Scan(options));
                 typeClone.GenericParameters.Clear();
             }
 
@@ -89,7 +89,7 @@ namespace ILEdit.Injection.Existing.Importers
             foreach (var f in ((TypeDefinition)Member).Fields)
             {
                 options.CancellationToken.ThrowIfCancellationRequested();
-                importList.Add(new FieldImporter(f, typeClone, DestinationModule, false).Scan(options));
+                importList.Add(new FieldImporter(f, typeClone, Session, false).Scan(options));
             }
 
             //TODO: other members

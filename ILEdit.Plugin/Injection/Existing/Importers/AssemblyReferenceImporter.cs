@@ -10,8 +10,8 @@ namespace ILEdit.Injection.Existing.Importers
 {
     internal class AssemblyReferenceImporter : MemberImporter, IMetadataTokenProvider
     {
-        public AssemblyReferenceImporter(IMetadataTokenProvider member, IMetadataTokenProvider destination, ModuleDefinition destModule)
-            : base(member, destination, destModule)
+        public AssemblyReferenceImporter(IMetadataTokenProvider member, MemberImportingSession session)
+            : base(member, session.DestinationModule, session)
         {
         }
 

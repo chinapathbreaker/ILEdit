@@ -554,39 +554,41 @@ namespace ILEdit
         /// <param name="importList"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        public static MemberImporter CreateTypeImporter(TypeReference type, TypeDefinition destType, ModuleDefinition destModule, List<MemberImporter> importList, MemberImportingOptions options)
+        public static MemberImporter CreateTypeImporter(TypeReference type, MemberImportingSession session, List<MemberImporter> importList, MemberImportingOptions options)
         {
-            //Checks if the type is a generic instance type
-            if (type is GenericInstanceType)
-                return Helpers.CreateTypeImporterForGenericType((GenericInstanceType)type, destType, destModule, importList, options);
+            //Checks if the type is a generic instance type or a generic parameter
+            if (type is GenericParameter)
+                return MemberImporter.Create((_, __) => type);
+            else if (type is GenericInstanceType)
+                return Helpers.CreateTypeImporterForGenericType((GenericInstanceType)type, session, importList, options);
             else
-                return Helpers.CreateTypeImporterForTypeDefinition(((TypeReference)type).Resolve(), destType, destModule, importList, options);
+                return Helpers.CreateTypeImporterForTypeDefinition(((TypeReference)type).Resolve(), session, importList, options);
         }
 
-        private static MemberImporter CreateTypeImporterForTypeDefinition(TypeDefinition type, TypeDefinition destType, ModuleDefinition destModule, List<MemberImporter> importList, MemberImportingOptions options)
+        private static MemberImporter CreateTypeImporterForTypeDefinition(TypeDefinition type, MemberImportingSession session, List<MemberImporter> importList, MemberImportingOptions options)
         {
             //Checks if the type is accessible
-            if (Helpers.IsTypeAccessibleFrom(type, destType))
+            if (Helpers.IsTypeAccessibleFrom(type, session.DestinationType))
             {
                 //Queues addition of an assembly reference
-                if (type.Module != destModule)
-                    if (!destModule.AssemblyReferences.Any(x => x.FullName == type.Module.Assembly.Name.FullName))
-                        importList.Add(new AssemblyReferenceImporter(type.Module.Assembly.Name, destModule, destModule).Scan(options));
+                if (type.Module != session.DestinationModule)
+                    if (!session.DestinationModule.AssemblyReferences.Any(x => x.FullName == type.Module.Assembly.Name.FullName))
+                        importList.Add(new AssemblyReferenceImporter(type.Module.Assembly.Name, session).Scan(options));
 
                 //Creates the type importer
-                return new TypeReferenceInModuleImporter(type, destModule, destModule).Scan(options);
+                return new TypeReferenceInModuleImporter(type, session).Scan(options);
             }
             else
             {
                 //Creates the type importer
-                return new TypeImporter(type, options.ImportAsNestedType ? (IMetadataTokenProvider)destType : (IMetadataTokenProvider)destModule, destModule).Scan(options);
+                return new TypeImporter(type, options.ImportAsNestedType ? (IMetadataTokenProvider)session.DestinationType : (IMetadataTokenProvider)session.DestinationModule, session).Scan(options);
             }
         }
 
-        private static MemberImporter CreateTypeImporterForGenericType(GenericInstanceType type, TypeDefinition destType, ModuleDefinition destModule, List<MemberImporter> importList, MemberImportingOptions options)
+        private static MemberImporter CreateTypeImporterForGenericType(GenericInstanceType type, MemberImportingSession session, List<MemberImporter> importList, MemberImportingOptions options)
         {
             //Returns the generic instance type importer
-            return new GenericInstanceTypeImporter(type, destType, destModule).Scan(options);
+            return new GenericInstanceTypeImporter(type, session.Destination, session).Scan(options);
         }
 
         #endregion

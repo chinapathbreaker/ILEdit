@@ -63,7 +63,6 @@
     <Compile Include="Injection\Existing\Importers\GenericInstanceTypeImporter.cs" />
     <Compile Include="Injection\Existing\Importers\GenericParametersImporter.cs" />
     <Compile Include="Injection\Existing\MemberImporter.cs" />
-    <Compile Include="Injection\Existing\MemberImporterFactory.cs" />
     <Compile Include="Injection\Existing\MemberImportingOptions.cs" />
     <Compile Include="Injection\Existing\Importers\TypeImporter.cs" />
     <Compile Include="Injection\Existing\Importers\TypeReferenceInModuleImporter.cs" />
@@ -86,6 +85,7 @@
     </Compile>
     <Compile Include="Injection\InjectWindow\InjectWindowViewModel.cs" />
     <Compile Include="Injection\MemberFilters.cs" />
+    <Compile Include="Injection\Existing\MemberImportingSession.cs" />
     <Compile Include="MemberSelection\GenericResolutionWindow.xaml.cs">
       <DependentUpon>GenericResolutionWindow.xaml</DependentUpon>
     </Compile>

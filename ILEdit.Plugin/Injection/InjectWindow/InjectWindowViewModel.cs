@@ -192,20 +192,23 @@ namespace ILEdit.Injection
 
                     //Starts a new task to perform importing
                     var t = new Task(() => {
-                        
-                        //Imports
-                        using (var importer = 
-                               ILEdit.Injection.Existing.MemberImporterFactory.Create(
-                                   ExistingSelectedMember, 
-                                   _node is ModuleTreeNode ? ((ModuleTreeNode)_node).Module : (IMetadataTokenProvider)((IMemberTreeNode)_node).Member,
-                                   _node is ModuleTreeNode ? ((ModuleTreeNode)_node).Module : ((IMemberTreeNode)_node).Member.Module))
-                        {
-                            //Options
-                            var options = new Existing.MemberImportingOptions()  {
-                                ImportAsNestedType = ExistingImportAsNestedTypes,
-                                CancellationToken = ct
-                            };
 
+                        //Options
+                        var options = new Existing.MemberImportingOptions()
+                        {
+                            ImportAsNestedType = ExistingImportAsNestedTypes,
+                            CancellationToken = ct
+                        };
+
+                        //Importing session
+                        var destType = !(_node is ModuleTreeNode) ? ((IMemberTreeNode)_node).Member as TypeDefinition : null;
+                        var destModule = destType != null ? destType.Module : ((ModuleTreeNode)_node).Module;
+                        var destAsm = Helpers.Tree.GetAssemblyNode(Helpers.Tree.GetModuleNode(destModule)).LoadedAssembly.AssemblyDefinition;
+                        var session = new ILEdit.Injection.Existing.MemberImportingSession(destAsm, destModule, destType, options);
+
+                        //Imports
+                        using (var importer = session.CreateImporter(ExistingSelectedMember))
+                        {
                             //Performs scanning
                             importer.Scan(options);
 

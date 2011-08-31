@@ -12,8 +12,8 @@ namespace ILEdit.Injection.Existing.Importers
     /// </summary>
     internal class TypeReferenceInModuleImporter : MemberImporter
     {
-        public TypeReferenceInModuleImporter(IMetadataTokenProvider member, IMetadataTokenProvider destination, ModuleDefinition destModule)
-            : base(member, destination, destModule)
+        public TypeReferenceInModuleImporter(IMetadataTokenProvider member, MemberImportingSession session)
+            : base(member, session.DestinationModule, session)
         {
         }
 
@@ -39,7 +39,7 @@ namespace ILEdit.Injection.Existing.Importers
             options.CancellationToken.ThrowIfCancellationRequested();
 
             //Imports and returns
-            return ((ModuleDefinition)Destination).Import((TypeReference)Member);
+            return Session.DestinationModule.Import((TypeReference)Member);
         }
     }
 }

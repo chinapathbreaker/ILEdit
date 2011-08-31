@@ -14,8 +14,8 @@ namespace ILEdit.Injection.Existing.Importers
     {
         private CustomAttribute[] attribs;
 
-        public CustomAttributesImporter(IMetadataTokenProvider member, IMetadataTokenProvider destination, ModuleDefinition destModule)
-            : base(member, destination, destModule)
+        public CustomAttributesImporter(IMetadataTokenProvider member, IMetadataTokenProvider destination, MemberImportingSession session)
+            : base(member, destination, session)
         {
         }
 
@@ -32,9 +32,6 @@ namespace ILEdit.Injection.Existing.Importers
             //Clones the attributes
             attribs = ((ICustomAttributeProvider)Member).CustomAttributes.Select(x => x.Clone()).ToArray();
 
-            //Destination type
-            var destType = Destination is TypeReference ? ((TypeReference)Destination).Resolve() : ((IMemberDefinition)Destination).DeclaringType.Resolve();
-
             //Checks the attributes
             foreach (var x in attribs)
             {
@@ -43,7 +40,7 @@ namespace ILEdit.Injection.Existing.Importers
 
                 var a = x;
                 //Imports the type of the attribute
-                var typeImporter = Helpers.CreateTypeImporter(a.AttributeType.Resolve(), destType, DestinationModule, importList, options);
+                var typeImporter = Helpers.CreateTypeImporter(a.AttributeType.Resolve(), Session, importList, options);
                 importList.Add(typeImporter);
                 typeImporter.ImportFinished += (typeRef) => a.Constructor = Helpers.GetConstructorMatchingArguments(((TypeReference)typeRef).Resolve(), a.ConstructorArguments);
 
@@ -52,7 +49,7 @@ namespace ILEdit.Injection.Existing.Importers
                 {
                     var p = a.ConstructorArguments[i];
                     //Imports the type of the argument
-                    var argumentTypeImporter = Helpers.CreateTypeImporter(p.Type.Resolve(), destType, DestinationModule, importList, options);
+                    var argumentTypeImporter = Helpers.CreateTypeImporter(p.Type.Resolve(), Session, importList, options);
                     importList.Add(argumentTypeImporter);
                     var index = i;
                     argumentTypeImporter.ImportFinished += (typeRef) => {

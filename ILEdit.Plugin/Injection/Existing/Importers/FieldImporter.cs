@@ -15,13 +15,13 @@ namespace ILEdit.Injection.Existing.Importers
         private FieldDefinition fieldClone;
         private bool _createNode;
 
-        public FieldImporter(IMetadataTokenProvider member, IMetadataTokenProvider destination, ModuleDefinition destModule)
-            : this(member, destination, destModule, true)
+        public FieldImporter(IMetadataTokenProvider member, IMetadataTokenProvider destination, MemberImportingSession session)
+            : this(member, destination, session, true)
         {
         }
 
-        public FieldImporter(IMetadataTokenProvider member, IMetadataTokenProvider destination, ModuleDefinition destModule, bool createNode)
-            : base(member, destination, destModule)
+        public FieldImporter(IMetadataTokenProvider member, IMetadataTokenProvider destination, MemberImportingSession session, bool createNode)
+            : base(member, destination, session)
         {
             _createNode = createNode;
         }
@@ -42,17 +42,14 @@ namespace ILEdit.Injection.Existing.Importers
             //Field type
             var fieldType = fieldClone.FieldType;
 
-            //Destination type
-            var destType = (TypeDefinition)Destination;
-
             //Imports the type
-            var typeImporter = Helpers.CreateTypeImporter(fieldType, destType, DestinationModule, importList, options);
+            var typeImporter = Helpers.CreateTypeImporter(fieldType, Session, importList, options);
             importList.Add(typeImporter);
             typeImporter.ImportFinished += (typeRef) => fieldClone.FieldType = (TypeReference)typeRef;
 
             //Checks the attributes of the field
             if (fieldClone.HasCustomAttributes)
-                importList.Add(new CustomAttributesImporter(fieldClone, fieldClone, DestinationModule).Scan(options));
+                importList.Add(new CustomAttributesImporter(fieldClone, fieldClone, Session).Scan(options));
         }
 
         protected override IEnumerable<IMetadataTokenProvider> GetMembersForPreview()

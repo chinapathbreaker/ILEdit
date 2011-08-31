@@ -67,23 +67,33 @@ namespace ILEdit.Injection.Existing
         /// Creates a new instance of this MemberImporter
         /// </summary>
         /// <param name="member">Member to import</param>
+        /// <param name="session">Importing session</param>
+        public MemberImporter(IMetadataTokenProvider member, MemberImportingSession session)
+            : this(member, session.Destination, session)
+        {
+        }
+
+        /// <summary>
+        /// Creates a new instance of this MemberImporter
+        /// </summary>
+        /// <param name="member">Member to import</param>
         /// <param name="destination">Destination of the importing</param>
-        /// <param name="node">Node where the member will be imported</param>
-        public MemberImporter(IMetadataTokenProvider member, IMetadataTokenProvider destination, ModuleDefinition destModule)
+        /// <param name="session">Importing session</param>
+        public MemberImporter(IMetadataTokenProvider member, IMetadataTokenProvider destination, MemberImportingSession session)
         {
             //Checks if the member can be imported (and that member and destination aren't null)
             if (!CanImport(member, destination))
-                throw new ArgumentException(string.Format("Cannot import '{0}' into '{1}'", member, destination));
+                throw new ArgumentException(string.Format("Cannot import '{0}' into '{1}'", member, session.Destination));
 
             //Stores member and destination
             _member = member;
             _destination = destination;
-            _DestinationModule = destModule;
+            _Session = session;
         }
 
         #endregion
 
-        #region Properties Member, Destination, DestinationModule and Scanned
+        #region Properties Member, Destination, Session and Scanned
 
         private IMetadataTokenProvider _member;
         /// <summary>
@@ -99,18 +109,16 @@ namespace ILEdit.Injection.Existing
         /// <summary>
         /// Destination of the importing
         /// </summary>
-        public IMetadataTokenProvider Destination
-        {
-            get { return _destination; }
-        }
+        public IMetadataTokenProvider Destination { get { return _destination; } }
+        
 
 
-        private ModuleDefinition _DestinationModule;
+        private MemberImportingSession _Session;
         /// <summary>
-        /// Module destination of the importing
+        /// Current importing session
         /// </summary>
-        public ModuleDefinition DestinationModule { get { return _DestinationModule; } }
-
+        public MemberImportingSession Session { get { return _Session; } }
+        
 
         /// <summary>
         /// Returns a value indicating whether the scan has been performed
