@@ -62,6 +62,8 @@
     <Compile Include="Injection\Existing\Importers\FieldImporter.cs" />
     <Compile Include="Injection\Existing\Importers\GenericInstanceTypeImporter.cs" />
     <Compile Include="Injection\Existing\Importers\GenericParametersImporter.cs" />
+    <Compile Include="Injection\Existing\Importers\MethodImporter.cs" />
+    <Compile Include="Injection\Existing\Importers\TypeSpecificationImporter.cs" />
     <Compile Include="Injection\Existing\MemberImporter.cs" />
     <Compile Include="Injection\Existing\MemberImportingOptions.cs" />
     <Compile Include="Injection\Existing\Importers\TypeImporter.cs" />

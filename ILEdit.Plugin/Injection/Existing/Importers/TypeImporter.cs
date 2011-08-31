@@ -85,12 +85,17 @@ namespace ILEdit.Injection.Existing.Importers
             //Throws if cancellation was requested
             options.CancellationToken.ThrowIfCancellationRequested();
 
-            //Registers the importing of the fields
-            foreach (var f in ((TypeDefinition)Member).Fields)
-            {
-                options.CancellationToken.ThrowIfCancellationRequested();
-                importList.Add(new FieldImporter(f, typeClone, Session, false).Scan(options));
-            }
+            //Registers the importing of the members
+            var type = (TypeDefinition)Member;
+            var importers =
+                type.Fields.Select(f => new FieldImporter(f, typeClone, Session, false).Scan(options))
+                .Concat(
+                    type.Methods
+                    .Where(m => !(m.IsGetter || m.IsSetter || m.IsAddOn || m.IsRemoveOn || m.IsFire || m.IsOther))
+                    .Select(m => new MethodImporter(m, typeClone, Session, false).Scan(options))
+                );
+            foreach (var x in importers)
+                importList.Add(x);
 
             //TODO: other members
         }

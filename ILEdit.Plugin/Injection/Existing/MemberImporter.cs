@@ -83,7 +83,7 @@ namespace ILEdit.Injection.Existing
         {
             //Checks if the member can be imported (and that member and destination aren't null)
             if (!CanImport(member, destination))
-                throw new ArgumentException(string.Format("Cannot import '{0}' into '{1}'", member, session.Destination));
+                throw new ArgumentException(string.Format("{0} cannot import '{1}' into '{2}'", this.GetType().Name, member, destination));
 
             //Stores member and destination
             _member = member;

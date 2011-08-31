@@ -178,11 +178,11 @@ namespace ILEdit
             int ret;
             if (_ridCache.TryGetValue(module, out ret))
             {
-                return (_ridCache[module] = (ret + 1));
+                return (_ridCache[module] = (ret - 1));
             }
             else
             {
-                _ridCache.Add(module, ret = (module.GetMemberReferences().Count() + 1));
+                _ridCache.Add(module, ret = (0x00ffffff - 1));
                 return ret;
             }
         }

@@ -368,6 +368,41 @@ namespace ILEdit
 
         #endregion
 
+        #region MethodDefinition.Clone() extension
+
+        /// <summary>
+        /// Clones this method
+        /// </summary>
+        /// <param name="method"></param>
+        /// <returns></returns>
+        public static MethodDefinition Clone(this MethodDefinition method)
+        {
+            var m = new MethodDefinition(method.Name, method.Attributes, method.ReturnType)
+            {
+                CallingConvention = method.CallingConvention,
+                ExplicitThis = method.ExplicitThis,
+                HasThis = method.HasThis,
+                ImplAttributes = method.ImplAttributes,
+                MetadataToken = new MetadataToken(method.MetadataToken.TokenType, GlobalContainer.GetFreeRID(method.Module)),
+                MethodReturnType = method.MethodReturnType,
+                PInvokeInfo = method.PInvokeInfo
+            };
+            m.IsPInvokeImpl = m.PInvokeInfo != null;
+            var body = m.Body;
+            body.GetType().GetField("code_size", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).SetValue(body, 1);
+            foreach (var x in method.CustomAttributes)
+                m.CustomAttributes.Add(x);
+            foreach (var x in method.GenericParameters)
+                m.GenericParameters.Add(x);
+            foreach (var x in method.Overrides)
+                m.Overrides.Add(x);
+            foreach (var x in method.SecurityDeclarations)
+                m.SecurityDeclarations.Add(x);
+            return m;
+        }
+
+        #endregion
+
         #region CustomAttribute.Clone() extension
 
         /// <summary>
@@ -378,6 +413,7 @@ namespace ILEdit
         public static CustomAttribute Clone(this CustomAttribute attr)
         {
             var a = new CustomAttribute(attr.Constructor);
+            a.GetType().GetField("blob", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).SetValue(a, attr.GetBlob());
             foreach (var x in attr.ConstructorArguments)
                 a.ConstructorArguments.Add(x);
             foreach (var x in attr.Fields)
@@ -559,8 +595,8 @@ namespace ILEdit
             //Checks if the type is a generic instance type or a generic parameter
             if (type is GenericParameter)
                 return MemberImporter.Create((_, __) => type);
-            else if (type is GenericInstanceType)
-                return Helpers.CreateTypeImporterForGenericType((GenericInstanceType)type, session, importList, options);
+            else if (type is TypeSpecification)
+                return new TypeSpecificationImporter((TypeSpecification)type, session).Scan(options);
             else
                 return Helpers.CreateTypeImporterForTypeDefinition(((TypeReference)type).Resolve(), session, importList, options);
         }
@@ -583,12 +619,6 @@ namespace ILEdit
                 //Creates the type importer
                 return new TypeImporter(type, options.ImportAsNestedType ? (IMetadataTokenProvider)session.DestinationType : (IMetadataTokenProvider)session.DestinationModule, session).Scan(options);
             }
-        }
-
-        private static MemberImporter CreateTypeImporterForGenericType(GenericInstanceType type, MemberImportingSession session, List<MemberImporter> importList, MemberImportingOptions options)
-        {
-            //Returns the generic instance type importer
-            return new GenericInstanceTypeImporter(type, session.Destination, session).Scan(options);
         }
 
         #endregion

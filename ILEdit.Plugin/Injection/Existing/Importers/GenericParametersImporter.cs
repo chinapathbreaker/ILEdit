@@ -46,7 +46,7 @@ namespace ILEdit.Injection.Existing.Importers
                     importer.ImportFinished += (constraint) => param.Constraints.Add((TypeReference)constraint);
                     importList.Add(importer);
                 }
-                foreach (var x in param.Constraints.Where(x => !(x is GenericParameter)))
+                foreach (var x in param.Constraints.Where(x => !(x is GenericParameter)).ToArray())
                     param.Constraints.Remove(x);
             }
         }

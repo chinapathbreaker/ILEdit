@@ -21,7 +21,7 @@ namespace ILEdit.Injection.Existing.Importers
 
         protected override bool CanImportCore(Mono.Cecil.IMetadataTokenProvider member, Mono.Cecil.IMetadataTokenProvider destination)
         {
-            return member is ICustomAttributeProvider && destination is ICustomAttributeProvider && destination is IMemberDefinition;
+            return member is ICustomAttributeProvider && destination is ICustomAttributeProvider;
         }
 
         protected override void ScanCore(MemberImportingOptions options, List<MemberImporter> importList)
