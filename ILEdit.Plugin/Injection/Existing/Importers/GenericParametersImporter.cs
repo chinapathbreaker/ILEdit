@@ -44,7 +44,6 @@ namespace ILEdit.Injection.Existing.Importers
                 {
                     var importer = Helpers.CreateTypeImporter(c, Session, importList, options);
                     importer.ImportFinished += (constraint) => param.Constraints.Add((TypeReference)constraint);
-                    importList.Add(importer);
                 }
                 foreach (var x in param.Constraints.Where(x => !(x is GenericParameter)).ToArray())
                     param.Constraints.Remove(x);

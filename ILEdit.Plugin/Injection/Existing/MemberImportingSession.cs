@@ -66,6 +66,13 @@ namespace ILEdit.Injection.Existing
         }
 
 
+        private Dictionary<IMetadataTokenProvider, MemberImporter> _RegisteredImporters = new Dictionary<IMetadataTokenProvider,MemberImporter>();
+        /// <summary>
+        /// Returns a dictionary containing the registered importers (used to avoid double references or double types)
+        /// </summary>
+        public Dictionary<IMetadataTokenProvider, MemberImporter> RegisteredImporters { get { return _RegisteredImporters; } }
+        
+
         private MemberImportingOptions _Options;
         /// <summary>
         /// Importing options

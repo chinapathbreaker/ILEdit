@@ -53,7 +53,6 @@ namespace ILEdit.Injection.Existing.Importers
             //Imports the return type
             var retImporter = Helpers.CreateTypeImporter(originalMethod.ReturnType, Session, importList, options);
             retImporter.ImportFinished += t => methodClone.ReturnType = (TypeReference)t;
-            importList.Add(retImporter);
             
             //Imports the attributes of the return type
             if (methodClone.MethodReturnType.HasCustomAttributes)
@@ -84,7 +83,6 @@ namespace ILEdit.Injection.Existing.Importers
                 //Queues importing of type
                 var typeImporter = Helpers.CreateTypeImporter(p.ParameterType, Session, importList, options);
                 typeImporter.ImportFinished += t => param.ParameterType = (TypeReference)t;
-                importList.Add(typeImporter);
             }
 
             //TODO: overrides

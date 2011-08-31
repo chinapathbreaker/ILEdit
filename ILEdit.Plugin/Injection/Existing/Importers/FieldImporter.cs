@@ -44,7 +44,6 @@ namespace ILEdit.Injection.Existing.Importers
 
             //Imports the type
             var typeImporter = Helpers.CreateTypeImporter(fieldType, Session, importList, options);
-            importList.Add(typeImporter);
             typeImporter.ImportFinished += (typeRef) => fieldClone.FieldType = (TypeReference)typeRef;
 
             //Checks the attributes of the field

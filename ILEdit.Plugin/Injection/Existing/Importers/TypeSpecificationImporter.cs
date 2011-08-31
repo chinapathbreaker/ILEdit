@@ -37,7 +37,6 @@ namespace ILEdit.Injection.Existing.Importers
 
             //Creates the importer for the element type
             importer = Helpers.CreateTypeImporter(type.ElementType, Session, importList, options);
-            importList.Add(importer);
 
             //Switches on the metadata type of the specification
             switch (type.MetadataType)

@@ -29,7 +29,6 @@ namespace ILEdit.Injection.Existing.Importers
             var elType = type.ElementType.Resolve();
             var elTypeImporter = Helpers.CreateTypeImporter(elType, Session, importList, options);
             elTypeImporter.ImportFinished += t => retType = new GenericInstanceType((TypeReference)t);
-            importList.Add(elTypeImporter);
 
             //Throws if cancellation was requested
             options.CancellationToken.ThrowIfCancellationRequested();
@@ -46,7 +45,6 @@ namespace ILEdit.Injection.Existing.Importers
                 {
                     var argImporter = Helpers.CreateTypeImporter(a, Session, importList, options);
                     argImporter.ImportFinished += x => retType.GenericArguments.Add((TypeReference)x);
-                    importList.Add(argImporter);
                 }
             }
 

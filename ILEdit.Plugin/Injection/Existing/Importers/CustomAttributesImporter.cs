@@ -41,7 +41,6 @@ namespace ILEdit.Injection.Existing.Importers
                 var a = x;
                 //Imports the type of the attribute
                 var typeImporter = Helpers.CreateTypeImporter(a.AttributeType.Resolve(), Session, importList, options);
-                importList.Add(typeImporter);
                 typeImporter.ImportFinished += (typeRef) => a.Constructor = Helpers.GetConstructorMatchingArguments(((TypeReference)typeRef).Resolve(), a.ConstructorArguments);
 
                 //Checks if the arguments should be imported
@@ -50,7 +49,6 @@ namespace ILEdit.Injection.Existing.Importers
                     var p = a.ConstructorArguments[i];
                     //Imports the type of the argument
                     var argumentTypeImporter = Helpers.CreateTypeImporter(p.Type.Resolve(), Session, importList, options);
-                    importList.Add(argumentTypeImporter);
                     var index = i;
                     argumentTypeImporter.ImportFinished += (typeRef) => {
                         a.ConstructorArguments.RemoveAt(index);

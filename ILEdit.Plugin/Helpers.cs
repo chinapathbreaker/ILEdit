@@ -578,6 +578,43 @@ namespace ILEdit
             return false;
         }
 
+        /// <summary>
+        /// Returns a value indicating whether the given type is accessible from a given context
+        /// </summary>
+        /// <param name="type">Type to check</param>
+        /// <param name="context">Context from which the type should be accessible</param>
+        /// <returns></returns>
+        public static bool IsTypeAccessibleFrom(TypeDefinition type, ModuleDefinition context)
+        {
+            //Checks if the type is public or nested public
+            if (type.IsPublic || type.IsNestedPublic)
+                return true;
+
+            //Checks if the types are nested
+            if (type.DeclaringType == null)
+            {
+                //If it's internal returns true only if they are in the same assembly
+                return
+                    (type.Attributes & TypeAttributes.NotPublic) == TypeAttributes.NotPublic
+                    && (type.Module == context || type.Module.Assembly == context.Assembly);
+            }
+            else
+            {
+                //Switches on the visibility of the type
+                switch (type.Attributes & TypeAttributes.VisibilityMask)
+                {
+                    case TypeAttributes.NestedFamily:
+                    case TypeAttributes.NestedAssembly:
+                    case TypeAttributes.NestedFamANDAssem:
+                    case TypeAttributes.NestedFamORAssem:
+                        return type.Module == context || type.Module.Assembly == context.Assembly;
+                }
+            }
+
+            //Returns false
+            return false;
+        }
+
         #endregion
 
         #region CreateTypeImporter
@@ -592,32 +629,62 @@ namespace ILEdit
         /// <returns></returns>
         public static MemberImporter CreateTypeImporter(TypeReference type, MemberImportingSession session, List<MemberImporter> importList, MemberImportingOptions options)
         {
+            //Return value
+            MemberImporter ret;
+
             //Checks if the type is a generic instance type or a generic parameter
             if (type is GenericParameter)
-                return MemberImporter.Create((_, __) => type);
+                ret = MemberImporter.Create((_, __) => type);
             else if (type is TypeSpecification)
-                return new TypeSpecificationImporter((TypeSpecification)type, session).Scan(options);
+                ret = new TypeSpecificationImporter((TypeSpecification)type, session).Scan(options);
             else
-                return Helpers.CreateTypeImporterForTypeDefinition(((TypeReference)type).Resolve(), session, importList, options);
+            {
+                //Checks if the importer is in the dictionary
+                MemberImporter importer;
+                if (session.RegisteredImporters.TryGetValue(type, out importer))
+                    return importer;
+
+                //Creates the importer, registers it and returns
+                importer = Helpers.CreateTypeImporterForTypeDefinition(((TypeReference)type).Resolve(), session, importList, options);
+                session.RegisteredImporters.Add(type, importer);
+                importer.Scan(options);
+                importList.Add(importer);
+                return importer;
+            }
+
+            //Adds the return value to the import list and returns
+            importList.Add(ret);
+            return ret;
         }
 
         private static MemberImporter CreateTypeImporterForTypeDefinition(TypeDefinition type, MemberImportingSession session, List<MemberImporter> importList, MemberImportingOptions options)
         {
             //Checks if the type is accessible
-            if (Helpers.IsTypeAccessibleFrom(type, session.DestinationType))
+            if (
+                (session.DestinationType != null && Helpers.IsTypeAccessibleFrom(type, session.DestinationType)) ||
+                Helpers.IsTypeAccessibleFrom(type, session.DestinationModule)
+                )
             {
                 //Queues addition of an assembly reference
                 if (type.Module != session.DestinationModule)
                     if (!session.DestinationModule.AssemblyReferences.Any(x => x.FullName == type.Module.Assembly.Name.FullName))
-                        importList.Add(new AssemblyReferenceImporter(type.Module.Assembly.Name, session).Scan(options));
+                    {
+                        //Checks if the reference importer is already in the dictionary
+                        MemberImporter importer;
+                        if (!session.RegisteredImporters.TryGetValue(type.Module.Assembly.Name, out importer))
+                        {
+                            importList.Add(importer = new AssemblyReferenceImporter(type.Module.Assembly.Name, session).Scan(options));
+                            session.RegisteredImporters.Add(type.Module.Assembly.Name, importer);
+                        }
+                    }
 
                 //Creates the type importer
-                return new TypeReferenceInModuleImporter(type, session).Scan(options);
+                return new TypeReferenceInModuleImporter(type, session);
             }
             else
             {
                 //Creates the type importer
-                return new TypeImporter(type, options.ImportAsNestedType ? (IMetadataTokenProvider)session.DestinationType : (IMetadataTokenProvider)session.DestinationModule, session).Scan(options);
+                return new TypeImporter(type, options.ImportAsNestedType ? (IMetadataTokenProvider)session.DestinationType : (IMetadataTokenProvider)session.DestinationModule, session);
             }
         }
 
