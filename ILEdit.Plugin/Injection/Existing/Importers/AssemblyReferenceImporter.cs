@@ -43,7 +43,7 @@ namespace ILEdit.Injection.Existing.Importers
             //Adds the reference only if it doesn't already exist
             module.AssemblyReferences.Add(asm);
             Helpers.Tree.GetModuleNode(module)
-                .Children.FirstOrDefault(x => x is ReferenceFolderTreeNode)
+                .Children.EnsureLazyChildren().FirstOrDefault(x => x is ReferenceFolderTreeNode)
                 .AddChildAndColorAncestors(new ILEditTreeNode(asm, true));
 
             //Returns null

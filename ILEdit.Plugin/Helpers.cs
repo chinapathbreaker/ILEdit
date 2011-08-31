@@ -73,7 +73,8 @@ namespace ILEdit
             {
                 return
                     ICSharpCode.ILSpy.MainWindow.Instance.RootNode.Children
-                    .SelectMany(x => x.Children.Cast<ModuleTreeNode>())
+                    .EnsureLazyChildren()
+                    .SelectMany(x => x.Children.EnsureLazyChildren().Cast<ModuleTreeNode>())
                     .FirstOrDefault(x => x.Module == module);
             }
 
@@ -509,6 +510,24 @@ namespace ILEdit
                     break;
                 parent.Foreground = GlobalContainer.ModifiedNodesBrush;
                 parent = parent.Parent;
+            }
+        }
+
+        #endregion
+
+        #region SharpTreeNodeCollection.EnsureLazyChildren() extension
+
+        /// <summary>
+        /// Makes sure that every child in this collection is ready
+        /// </summary>
+        /// <param name="coll"></param>
+        /// <returns></returns>
+        public static IEnumerable<SharpTreeNode> EnsureLazyChildren(this SharpTreeNodeCollection coll)
+        {
+            foreach (var x in coll)
+            {
+                x.EnsureLazyChildren();
+                yield return x;
             }
         }
 

@@ -85,6 +85,16 @@ namespace ILEdit.Injection.Existing.Importers
             //Throws if cancellation was requested
             options.CancellationToken.ThrowIfCancellationRequested();
 
+            //Registers importing of base type
+            if (typeClone.BaseType != null && typeClone.BaseType.FullName != "System.Object")
+            {
+                var baseTypeImporter = Helpers.CreateTypeImporter(typeClone.BaseType, Session, importList, options);
+                baseTypeImporter.ImportFinished += t => typeClone.BaseType = (TypeReference)t;
+            }
+
+            //Throws if cancellation was requested
+            options.CancellationToken.ThrowIfCancellationRequested();
+
             //Registers the importing of the members
             var type = (TypeDefinition)Member;
             var importers =
@@ -95,7 +105,10 @@ namespace ILEdit.Injection.Existing.Importers
                     .Select(m => new MethodImporter(m, typeClone, Session, false).Scan(options))
                 );
             foreach (var x in importers)
+            {
+                options.CancellationToken.ThrowIfCancellationRequested();
                 importList.Add(x);
+            }
 
             //TODO: other members
         }
@@ -115,7 +128,7 @@ namespace ILEdit.Injection.Existing.Importers
                 //Finds the correct namespace
                 var ns = typeClone.Namespace;
                 var moduleNode = Helpers.Tree.GetModuleNode((ModuleDefinition)Destination);
-                var nsNode = moduleNode.Children.OfType<NamespaceTreeNode>().FirstOrDefault(x => x.Name == ns);
+                var nsNode = moduleNode.Children.EnsureLazyChildren().OfType<NamespaceTreeNode>().FirstOrDefault(x => x.Name == ns);
                 if (nsNode != null)
                     nsNode.AddChildAndColorAncestors(new ILEditTreeNode(typeClone, false));
                 else
