@@ -23,7 +23,7 @@ namespace ILEdit.Injection.Existing.Importers
         protected override void ScanCore(MemberImportingOptions options, List<MemberImporter> importList)
         {
             //Clones the generic parameters
-            parametersClone = ((IGenericParameterProvider)Member).GenericParameters.Select(x => x.Clone((IGenericParameterProvider)Destination)).ToArray();
+            parametersClone = ((IGenericParameterProvider)Member).GenericParameters.Select(x => x.Clone((IGenericParameterProvider)Destination, Session)).ToArray();
 
             //For each parameter
             foreach (var p in parametersClone)

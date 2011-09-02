@@ -35,7 +35,7 @@ namespace ILEdit.Injection.Existing.Importers
         {
             //Method
             var originalMethod = (MethodDefinition)Member;
-            methodClone = originalMethod.Clone();
+            methodClone = originalMethod.Clone(Session);
 
             //Imports the generic parameters
             if (methodClone.HasGenericParameters)

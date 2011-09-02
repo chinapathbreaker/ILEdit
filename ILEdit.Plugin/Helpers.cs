@@ -350,7 +350,7 @@ namespace ILEdit
         /// </summary>
         /// <param name="field"></param>
         /// <returns></returns>
-        public static FieldDefinition Clone(this FieldDefinition field)
+        public static FieldDefinition Clone(this FieldDefinition field, MemberImportingSession session)
         {
             var f = new FieldDefinition(field.Name, field.Attributes, field.FieldType)
             {
@@ -360,7 +360,7 @@ namespace ILEdit
                 Constant = field.Constant,
                 MarshalInfo = field.MarshalInfo,
                 HasDefault = field.HasDefault,
-                MetadataToken = new MetadataToken(field.MetadataToken.TokenType, GlobalContainer.GetFreeRID(field.Module))
+                MetadataToken = new MetadataToken(field.MetadataToken.TokenType, GlobalContainer.GetFreeRID(session.DestinationModule))
             };
             foreach (var x in field.CustomAttributes)
                 f.CustomAttributes.Add(x);
@@ -376,7 +376,7 @@ namespace ILEdit
         /// </summary>
         /// <param name="method"></param>
         /// <returns></returns>
-        public static MethodDefinition Clone(this MethodDefinition method)
+        public static MethodDefinition Clone(this MethodDefinition method, MemberImportingSession session)
         {
             var m = new MethodDefinition(method.Name, method.Attributes, method.ReturnType)
             {
@@ -384,7 +384,7 @@ namespace ILEdit
                 ExplicitThis = method.ExplicitThis,
                 HasThis = method.HasThis,
                 ImplAttributes = method.ImplAttributes,
-                MetadataToken = new MetadataToken(method.MetadataToken.TokenType, GlobalContainer.GetFreeRID(method.Module)),
+                MetadataToken = new MetadataToken(method.MetadataToken.TokenType, GlobalContainer.GetFreeRID(session.DestinationModule)),
                 MethodReturnType = method.MethodReturnType,
                 PInvokeInfo = method.PInvokeInfo
             };
@@ -400,6 +400,28 @@ namespace ILEdit
             foreach (var x in method.SecurityDeclarations)
                 m.SecurityDeclarations.Add(x);
             return m;
+        }
+
+        #endregion
+
+        #region PropertyDefinition.Clone() extension
+
+        /// <summary>
+        /// Clones this property
+        /// </summary>
+        /// <param name="prop"></param>
+        /// <returns></returns>
+        public static PropertyDefinition Clone(this PropertyDefinition prop, MemberImportingSession session)
+        {
+            var p = new PropertyDefinition(prop.Name, prop.Attributes, prop.PropertyType)
+            {
+                 GetMethod = prop.GetMethod,
+                 SetMethod = prop.SetMethod,
+                 MetadataToken = new MetadataToken(prop.MetadataToken.TokenType, GlobalContainer.GetFreeRID(session.DestinationModule))
+            };
+            foreach (var x in prop.CustomAttributes)
+                p.CustomAttributes.Add(x);
+            return p;
         }
 
         #endregion
@@ -433,14 +455,14 @@ namespace ILEdit
         /// </summary>
         /// <param name="field"></param>
         /// <returns></returns>
-        public static TypeDefinition Clone(this TypeDefinition type)
+        public static TypeDefinition Clone(this TypeDefinition type, MemberImportingSession session)
         {
             var t = new TypeDefinition(type.Namespace, type.Name, type.Attributes, type.BaseType)
             {
                 PackingSize = type.PackingSize,
                 ClassSize = type.ClassSize,
                 HasSecurity = type.HasSecurity,
-                MetadataToken = new MetadataToken(type.MetadataToken.TokenType, GlobalContainer.GetFreeRID(type.Module))
+                MetadataToken = new MetadataToken(type.MetadataToken.TokenType, GlobalContainer.GetFreeRID(session.DestinationModule))
             };
             foreach (var x in type.Interfaces)
                 t.Interfaces.Add(x);
@@ -462,14 +484,14 @@ namespace ILEdit
         /// </summary>
         /// <param name="field"></param>
         /// <returns></returns>
-        public static GenericParameter Clone(this GenericParameter param, IGenericParameterProvider owner)
+        public static GenericParameter Clone(this GenericParameter param, IGenericParameterProvider owner, MemberImportingSession session)
         {
             var p = new GenericParameter(param.Name, owner)
             {
                 Attributes = param.Attributes,
                 DeclaringType = param.DeclaringType,
                 HasDefaultConstructorConstraint = param.HasDefaultConstructorConstraint,
-                MetadataToken = new MetadataToken(param.MetadataToken.TokenType, GlobalContainer.GetFreeRID(param.Module))
+                MetadataToken = new MetadataToken(param.MetadataToken.TokenType, GlobalContainer.GetFreeRID(session.DestinationModule))
             };
             foreach (var x in param.Constraints)
                 p.Constraints.Add(x);

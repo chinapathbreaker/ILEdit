@@ -37,7 +37,7 @@ namespace ILEdit.Injection.Existing.Importers
             options.CancellationToken.ThrowIfCancellationRequested();
 
             //Field
-            fieldClone = ((FieldDefinition)Member).Clone();
+            fieldClone = ((FieldDefinition)Member).Clone(Session);
 
             //Field type
             var fieldType = fieldClone.FieldType;

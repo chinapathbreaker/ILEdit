@@ -28,7 +28,7 @@ namespace ILEdit.Injection.Existing.Importers
             options.CancellationToken.ThrowIfCancellationRequested();
 
             //Clones the type
-            typeClone = ((TypeDefinition)Member).Clone();
+            typeClone = ((TypeDefinition)Member).Clone(Session);
 
             //Adjusts the visibility of the type
             if (Destination.MetadataToken.TokenType == TokenType.Module)
@@ -103,7 +103,7 @@ namespace ILEdit.Injection.Existing.Importers
                     type.Methods
                     .Where(m => !(m.IsGetter || m.IsSetter || m.IsAddOn || m.IsRemoveOn || m.IsFire || m.IsOther))
                     .Select(m => new MethodImporter(m, typeClone, Session, false).Scan(options))
-                );
+                ).Concat(type.Properties.Select(p => new PropertyImporter(p, typeClone, Session, false).Scan(options)));
             foreach (var x in importers)
             {
                 options.CancellationToken.ThrowIfCancellationRequested();

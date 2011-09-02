@@ -98,8 +98,10 @@ namespace ILEdit.Injection.Existing
                 case TokenType.Field:
                     return new FieldImporter(member, Destination, this);
                 case TokenType.Method:
-                case TokenType.Event:
+                    return new MethodImporter(member, Destination, this);
                 case TokenType.Property:
+                    return new PropertyImporter(member, Destination, this);
+                case TokenType.Event:
                 default:
                     throw new ArgumentException("Cannot create an importer for " + member.ToString());
             }
