@@ -17,7 +17,7 @@ namespace ILEdit.Injection.Existing.Importers
 
         protected override bool CanImportCore(Mono.Cecil.IMetadataTokenProvider member, Mono.Cecil.IMetadataTokenProvider destination)
         {
-            return member is GenericInstanceType && destination is TypeDefinition;
+            return member is GenericInstanceType;
         }
 
         protected override void ScanCore(MemberImportingOptions options, List<MemberImporter> importList)
@@ -27,8 +27,14 @@ namespace ILEdit.Injection.Existing.Importers
 
             //Element type
             var elType = type.ElementType.Resolve();
+            retType = new GenericInstanceType(elType);
             var elTypeImporter = Helpers.CreateTypeImporter(elType, Session, importList, options);
-            elTypeImporter.ImportFinished += t => retType = new GenericInstanceType((TypeReference)t);
+            elTypeImporter.ImportFinished += t => { 
+                var newType = new GenericInstanceType((TypeReference)t);
+                foreach (var a in retType.GenericArguments)
+                    newType.GenericArguments.Add(a);
+                retType = newType;
+            };
 
             //Throws if cancellation was requested
             options.CancellationToken.ThrowIfCancellationRequested();

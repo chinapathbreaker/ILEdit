@@ -390,7 +390,7 @@ namespace ILEdit
             };
             m.IsPInvokeImpl = m.PInvokeInfo != null;
             var body = m.Body;
-            body.GetType().GetField("code_size", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).SetValue(body, 1);
+            body.GetType().GetField("code_size", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).SetValue(body, method.Body.CodeSize);
             foreach (var x in method.CustomAttributes)
                 m.CustomAttributes.Add(x);
             foreach (var x in method.GenericParameters)
@@ -462,9 +462,9 @@ namespace ILEdit
         /// </summary>
         /// <param name="field"></param>
         /// <returns></returns>
-        public static GenericParameter Clone(this GenericParameter param)
+        public static GenericParameter Clone(this GenericParameter param, IGenericParameterProvider owner)
         {
-            var p = new GenericParameter(param.Name, param.Owner)
+            var p = new GenericParameter(param.Name, owner)
             {
                 Attributes = param.Attributes,
                 DeclaringType = param.DeclaringType,
@@ -717,13 +717,14 @@ namespace ILEdit
         /// <param name="type">Type in which the constructor resides</param>
         /// <param name="pars">Parameters of the constructor</param>
         /// <returns></returns>
-        public static MethodDefinition GetConstructorMatchingArguments(TypeDefinition type, IEnumerable<CustomAttributeArgument> pars)
+        public static MethodReference GetConstructorMatchingArguments(TypeDefinition type, IEnumerable<CustomAttributeArgument> pars, MemberImportingSession session)
         {
-            return
+            var ctor =
                 type.Methods
                 .Where(x => x.Name == ".ctor")
                 .Where(x => x.Parameters.Count == pars.Count())
                 .FirstOrDefault(m => m.Parameters.Select((x, i) => Tuple.Create(x, i)).All(p => p.Item1.ParameterType.Name == pars.ElementAt(p.Item2).Type.Name && p.Item1.ParameterType.Namespace == pars.ElementAt(p.Item2).Type.Namespace));
+            return ctor == null ? null : session.DestinationModule.Import(ctor);
         }
 
         #endregion
