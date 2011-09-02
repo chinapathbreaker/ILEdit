@@ -47,7 +47,7 @@ namespace ICSharpCode.ILSpy.TreeNodes
 					this.Children.Add(new MethodTreeNode(m));
 			}
 
-            this.Foreground = new SolidColorBrush(IsPublicAPI ? Colors.Black : Colors.Gray);
+            this.Foreground = IsPublicAPI ? NodeBrushes.Normal : NodeBrushes.Private;
 
 		}
 

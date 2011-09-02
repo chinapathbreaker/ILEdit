@@ -40,7 +40,7 @@ namespace ICSharpCode.ILSpy.TreeNodes
 			this.type = type;
 			this.parentAssemblyNode = parentAssemblyNode;
 			this.LazyLoading = true;
-            this.Foreground = new SolidColorBrush(IsPublicAPI ? Colors.Black : Colors.Gray);
+            this.Foreground = IsPublicAPI ? NodeBrushes.Normal : NodeBrushes.Private;
 		}
 		
 		public TypeDefinition TypeDefinition {

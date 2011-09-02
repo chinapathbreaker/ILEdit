@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows;
 using System.Windows.Media;
 using ILEdit.Injection;
 using ILEdit.Injection.Injectors;
@@ -21,9 +22,17 @@ namespace ILEdit
         static GlobalContainer()
         {
             //Sets the brushes
-            NormalNodesBrush = new SolidColorBrush(Colors.Black);
-            NewNodesBrush = new SolidColorBrush(Colors.Red);
-            ModifiedNodesBrush = new SolidColorBrush(Color.FromArgb(255, 230, 96, 6));
+            //(performs this action on the UI thread)
+            Action createBrushes = () => 
+            {
+                NormalNodesBrush = ICSharpCode.ILSpy.NodeBrushes.Normal;
+                NewNodesBrush = Brushes.Red;
+                ModifiedNodesBrush = new SolidColorBrush(Color.FromArgb(255, 230, 96, 6));
+            };
+            if (Application.Current.Dispatcher.CheckAccess())
+                createBrushes();
+            else
+                Application.Current.Dispatcher.Invoke(createBrushes, null);
 
             //Adds the injectors
             Injectors = new List<IInjector>() { 
