@@ -59,6 +59,7 @@
     <Compile Include="ILEditTreeNode.cs" />
     <Compile Include="Injection\Existing\Importers\AssemblyReferenceImporter.cs" />
     <Compile Include="Injection\Existing\Importers\CustomAttributesImporter.cs" />
+    <Compile Include="Injection\Existing\Importers\EventImporter.cs" />
     <Compile Include="Injection\Existing\Importers\FieldImporter.cs" />
     <Compile Include="Injection\Existing\Importers\GenericInstanceTypeImporter.cs" />
     <Compile Include="Injection\Existing\Importers\GenericParametersImporter.cs" />

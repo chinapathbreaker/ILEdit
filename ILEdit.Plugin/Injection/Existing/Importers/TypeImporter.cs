@@ -103,7 +103,8 @@ namespace ILEdit.Injection.Existing.Importers
                     type.Methods
                     .Where(m => !(m.IsGetter || m.IsSetter || m.IsAddOn || m.IsRemoveOn || m.IsFire || m.IsOther))
                     .Select(m => new MethodImporter(m, typeClone, Session, false).Scan(options))
-                ).Concat(type.Properties.Select(p => new PropertyImporter(p, typeClone, Session, false).Scan(options)));
+                ).Concat(type.Properties.Select(p => new PropertyImporter(p, typeClone, Session, false).Scan(options)))
+                .Concat(type.Events.Select(e => new EventImporter(e, typeClone, Session, false).Scan(options)));
             foreach (var x in importers)
             {
                 options.CancellationToken.ThrowIfCancellationRequested();

@@ -426,6 +426,29 @@ namespace ILEdit
 
         #endregion
 
+        #region EventDefinition.Clone() extension
+
+        /// <summary>
+        /// Clones this event
+        /// </summary>
+        /// <param name="prop"></param>
+        /// <returns></returns>
+        public static EventDefinition Clone(this EventDefinition evt, MemberImportingSession session)
+        {
+            var e = new EventDefinition(evt.Name, evt.Attributes, evt.EventType)
+            {
+                AddMethod = evt.AddMethod,
+                InvokeMethod = evt.InvokeMethod,
+                MetadataToken = new MetadataToken(evt.MetadataToken.TokenType, GlobalContainer.GetFreeRID(session.DestinationModule)),
+                RemoveMethod = evt.RemoveMethod
+            };
+            foreach (var x in evt.CustomAttributes)
+                e.CustomAttributes.Add(x);
+            return e;
+        }
+
+        #endregion
+
         #region CustomAttribute.Clone() extension
 
         /// <summary>

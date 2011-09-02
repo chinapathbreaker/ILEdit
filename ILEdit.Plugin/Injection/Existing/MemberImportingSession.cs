@@ -102,6 +102,7 @@ namespace ILEdit.Injection.Existing
                 case TokenType.Property:
                     return new PropertyImporter(member, Destination, this);
                 case TokenType.Event:
+                    return new EventImporter(member, Destination, this);
                 default:
                     throw new ArgumentException("Cannot create an importer for " + member.ToString());
             }
