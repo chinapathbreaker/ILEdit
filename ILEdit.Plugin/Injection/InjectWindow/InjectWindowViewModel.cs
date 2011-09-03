@@ -52,7 +52,8 @@ namespace ILEdit.Injection
             //Loads from the settings the values of the properties of the 'existing' part
             var settings = GlobalContainer.InjectionSettings.Element("InjectExistingSettings");
             ExistingPreview = bool.Parse(settings.Attribute("Preview").Value);
-            ExistingImportAsNestedTypes = bool.Parse(settings.Attribute("ImportAsNestedTypes").Value);
+            ExistingImportAsNestedTypesEnabled = !(node is ModuleTreeNode);
+            ExistingImportAsNestedTypes = ExistingImportAsNestedTypesEnabled && bool.Parse(settings.Attribute("ImportAsNestedTypes").Value);
         }
         #endregion
 
@@ -132,6 +133,11 @@ namespace ILEdit.Injection
         /// Gets or sets a value indicating whether to import a new type as nested type or not
         /// </summary>
         public bool ExistingImportAsNestedTypes { get; set; }
+
+        /// <summary>
+        /// Gets a value indicating whether the user can choose the 'Import as nested types' option
+        /// </summary>
+        public bool ExistingImportAsNestedTypesEnabled { get; private set; }
 
         #endregion
 
@@ -278,7 +284,8 @@ namespace ILEdit.Injection
                 //Saves the settings
                 var settings = GlobalContainer.InjectionSettings.Element("InjectExistingSettings");
                 settings.SetAttributeValue("Preview", ExistingPreview);
-                settings.SetAttributeValue("ImportAsNestedTypes", ExistingImportAsNestedTypes);
+                if (ExistingImportAsNestedTypesEnabled)
+                    settings.SetAttributeValue("ImportAsNestedTypes", ExistingImportAsNestedTypes);
                 GlobalContainer.SettingsManager.Instance.Save();
 
                 //Closes the window

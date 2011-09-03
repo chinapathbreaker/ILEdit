@@ -182,7 +182,7 @@
                         	</GroupBox.Header>
                             <StackPanel>
                                 <CheckBox Content="Preview" IsChecked="{Binding ExistingPreview, Mode=TwoWay}" ToolTip="Gets or sets a value indicating whether to show a preview before performing the actual importing"/>
-                                <CheckBox Content="Import as nested types" IsChecked="{Binding ExistingImportAsNestedTypes, Mode=TwoWay}" ToolTip="Gets or sets a value indicating whether to import a new type as nested type or not"/>
+                                <CheckBox Content="Import as nested types" IsChecked="{Binding ExistingImportAsNestedTypes, Mode=TwoWay}" IsEnabled="{Binding ExistingImportAsNestedTypesEnabled, Mode=OneTime}"  ToolTip="Gets or sets a value indicating whether to import a new type as nested type or not"/>
                             </StackPanel>
                         </GroupBox>
                     </Grid>
